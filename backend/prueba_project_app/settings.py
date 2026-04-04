@@ -90,11 +90,20 @@ WSGI_APPLICATION = 'prueba_project_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+#DATABASES = {
+#    "default": env.db(
+#        "DATABASE_URL",
+#        default=f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}",
+#    )
+#}
+
 DATABASES = {
-    "default": env.db(
-        "DATABASE_URL",
-        default=f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}",
-    )
+    "default": env.db("DATABASE_URL")
+}
+
+DATABASES["default"]["OPTIONS"] = {
+    "sslmode": "require",
+    "options": "-4",  # IPv4 session pooling supabase
 }
 
 
