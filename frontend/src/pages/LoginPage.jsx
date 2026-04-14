@@ -28,7 +28,7 @@ export default function LoginPage() {
     <div className="container">
       <div className="card" style={{ maxWidth: 520, margin: '24px auto' }}>
         <h2>Iniciar Sesión</h2>
-        <p className="muted">Use sus credenciales de residente/manager/personal.</p>
+        <p className="muted">Use sus credenciales de residente/administrador/personal.</p>
         <div style={{ height: 10 }} />
         <form onSubmit={onSubmit}>
           <div className="field">

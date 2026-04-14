@@ -45,21 +45,21 @@ function AppNav() {
               </NavLink>
               {role === 'manager' && (
                 <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/admin-dashboard">
-                  Admin
+                  Administración
                 </NavLink>
               )}
               {role === 'staff' && (
                 <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/staff/assigned">
-                  Assigned
+                  Asignadas
                 </NavLink>
               )}
               {role === 'resident' && (
                 <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/payments">
-                  Payments
+                  Pagos
                 </NavLink>
               )}
               <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/announcements">
-                Announcements
+                Anuncios
               </NavLink>
               <span className="pill">{user.username}</span>
               <button className="btn danger" onClick={logout}>
