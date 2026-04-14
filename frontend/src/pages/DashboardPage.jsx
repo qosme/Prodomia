@@ -197,11 +197,11 @@ function NewComplaintForm({ onCreated }) {
   return (
     <form onSubmit={submit}>
       <div className="field">
-        <label>Title</label>
+        <label>Título</label>
         <input value={form.title} onChange={(e) => update('title', e.target.value)} required />
       </div>
       <div className="field">
-        <label>Description</label>
+        <label>Descripción</label>
         <textarea
           value={form.description}
           onChange={(e) => update('description', e.target.value)}
@@ -209,16 +209,16 @@ function NewComplaintForm({ onCreated }) {
         />
       </div>
       <div className="field">
-        <label>Location (optional)</label>
+        <label>Ubicación (opcional)</label>
         <input value={form.location} onChange={(e) => update('location', e.target.value)} />
       </div>
       <div className="field">
-        <label>Category (optional)</label>
+        <label>Categoría (opcional)</label>
         <input value={form.category} onChange={(e) => update('category', e.target.value)} />
       </div>
       {error && <div className="error">{error}</div>}
       <button className="btn primary" disabled={busy}>
-        {busy ? 'Submitting…' : 'Submit complaint'}
+        {busy ? 'Enviando…' : 'Enviar Reclamo'}
       </button>
     </form>
   )
