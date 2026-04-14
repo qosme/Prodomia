@@ -27,7 +27,7 @@ export default function LoginPage() {
   return (
     <div className="container">
       <div className="card" style={{ maxWidth: 520, margin: '24px auto' }}>
-        <h2>Login</h2>
+        <h2>Iniciar Sesión</h2>
         <p className="muted">Use sus credenciales de residente/manager/personal.</p>
         <div style={{ height: 10 }} />
         <form onSubmit={onSubmit}>
@@ -46,7 +46,7 @@ export default function LoginPage() {
           {error && <div className="error">{error}</div>}
           <div className="row" style={{ justifyContent: 'space-between', marginTop: 10 }}>
             <button className="btn primary" disabled={busy}>
-              {busy ? 'Signing in…' : 'Sign in'}
+              {busy ? 'Iniciando Sesión…' : 'Iniciar Sesión'}
             </button>
             <Link className="muted" to="/register">
               ¿Necesitas una cuenta?
