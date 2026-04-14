@@ -69,7 +69,7 @@ function AppNav() {
           ) : (
             <>
               <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/login">
-                Login
+                Iniciar Sesión
               </NavLink>
               <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/register">
                 Registrarse
