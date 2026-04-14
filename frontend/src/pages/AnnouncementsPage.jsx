@@ -15,14 +15,14 @@ export default function AnnouncementsPage() {
 
   return (
     <div className="container">
-      <h2>Announcements</h2>
+      <h2>Anuncios</h2>
       {error && <p className="error">{error}</p>}
       {loading ? (
         <p className="muted">Loading…</p>
       ) : announcements.length === 0 ? (
         <div className="card">
           <p className="muted" style={{ textAlign: 'center', margin: 0 }}>
-            No announcements at this time.
+            No hay anuncios disponibles.
           </p>
         </div>
       ) : (
@@ -37,7 +37,7 @@ export default function AnnouncementsPage() {
               </div>
               <p style={{ margin: '0 0 8px', whiteSpace: 'pre-wrap' }}>{a.body}</p>
               <span className="muted" style={{ fontSize: 12 }}>
-                Posted by {a.created_by_username}
+                Publicado por {a.created_by_username}
               </span>
             </div>
           ))}

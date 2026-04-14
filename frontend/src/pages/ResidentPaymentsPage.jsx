@@ -61,7 +61,7 @@ export default function ResidentPaymentsPage() {
 
   return (
     <div className="container">
-      <h2>My Payments</h2>
+      <h2>Mis Pagos</h2>
 
       {result === 'success' && (
         <div className="card" style={{ borderColor: 'rgba(34,197,94,0.4)', marginBottom: 20 }}>
@@ -89,7 +89,7 @@ export default function ResidentPaymentsPage() {
         <div className="grid">
           <div>
             <div className="card" style={{ marginBottom: 16 }}>
-              <h3 style={{ marginTop: 0 }}>Current Month Fee</h3>
+              <h3 style={{ marginTop: 0 }}>Cuota del Mes Actual</h3>
               {fee ? (
                 <>
                   <div style={{ fontSize: 36, fontWeight: 700, marginBottom: 8 }}>
@@ -116,16 +116,16 @@ export default function ResidentPaymentsPage() {
                   )}
                 </>
               ) : (
-                <p className="muted">No fee issued for this month yet.</p>
+                <p className="muted">No hay cuota disponible para este mes.</p>
               )}
             </div>
           </div>
 
           <div>
             <div className="card">
-              <h3 style={{ marginTop: 0 }}>Payment History</h3>
+              <h3 style={{ marginTop: 0 }}>Historial de Pagos</h3>
               {payments.length === 0 ? (
-                <p className="muted">No payment records yet.</p>
+                <p className="muted">No hay registros de pagos.</p>
               ) : (
                 <div className="list">
                   {payments.map((p) => (
