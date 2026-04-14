@@ -18,7 +18,7 @@ export default function LoginPage() {
       await login(username, password)
       nav('/')
     } catch (err) {
-      setError(err.message || 'Login failed')
+      setError(err.message || 'El inicio de sesión ha fallado')
     } finally {
       setBusy(false)
     }
