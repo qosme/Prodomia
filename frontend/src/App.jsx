@@ -35,7 +35,7 @@ function AppNav() {
     <div className="nav">
       <div className="container nav-inner">
         <NavLink className="brand" to="/">
-          CondoAdmin
+          Prodomia
         </NavLink>
         <div className="tabs">
           {user ? (
@@ -72,7 +72,7 @@ function AppNav() {
                 Login
               </NavLink>
               <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/register">
-                Register
+                Registrarse
               </NavLink>
             </>
           )}

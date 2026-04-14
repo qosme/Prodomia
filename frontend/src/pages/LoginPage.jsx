@@ -28,15 +28,15 @@ export default function LoginPage() {
     <div className="container">
       <div className="card" style={{ maxWidth: 520, margin: '24px auto' }}>
         <h2>Login</h2>
-        <p className="muted">Use your resident/manager/staff credentials.</p>
+        <p className="muted">Use sus credenciales de residente/manager/personal.</p>
         <div style={{ height: 10 }} />
         <form onSubmit={onSubmit}>
           <div className="field">
-            <label>Username</label>
+            <label>Nombre de Usuario</label>
             <input value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
           <div className="field">
-            <label>Password</label>
+            <label>Contraseña</label>
             <input
               type="password"
               value={password}
@@ -49,7 +49,7 @@ export default function LoginPage() {
               {busy ? 'Signing in…' : 'Sign in'}
             </button>
             <Link className="muted" to="/register">
-              Need an account?
+              ¿Necesitas una cuenta?
             </Link>
           </div>
         </form>
