@@ -20,10 +20,10 @@ export default function RegisterPage() {
     setBusy(true)
     try {
       await register(form)
-      setSuccess('Registered. Wait for manager approval, then login.')
+      setSuccess('Registrado. Espere aprobación del administrador, luego inicie sesión.')
       setTimeout(() => nav('/login'), 700)
     } catch (err) {
-      setError(err.message || 'Registration failed')
+      setError(err.message || 'El registro ha fallado')
     } finally {
       setBusy(false)
     }
@@ -32,22 +32,22 @@ export default function RegisterPage() {
   return (
     <div className="container">
       <div className="card" style={{ maxWidth: 720, margin: '24px auto' }}>
-        <h2>Create resident account</h2>
-        <p className="muted">A manager must approve you before you can submit complaints.</p>
+        <h2>Crear una cuenta de usuario</h2>
+        <p className="muted">Un administrador debe aprobar su cuenta antes de que pueda enviar quejas.</p>
         <div style={{ height: 10 }} />
         <form onSubmit={onSubmit}>
           <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="field">
-              <label>Username</label>
+              <label>Nombre de Usuario</label>
               <input value={form.username} onChange={(e) => update('username', e.target.value)} />
             </div>
             <div className="field">
-              <label>Email (optional)</label>
+              <label>Email (opcional)</label>
               <input value={form.email} onChange={(e) => update('email', e.target.value)} />
             </div>
           </div>
           <div className="field">
-            <label>Password</label>
+            <label>Contraseña</label>
             <input
               type="password"
               value={form.password}
@@ -56,11 +56,11 @@ export default function RegisterPage() {
           </div>
           <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="field">
-              <label>Unit (optional)</label>
+              <label>Unidad (opcional)</label>
               <input value={form.unit} onChange={(e) => update('unit', e.target.value)} />
             </div>
             <div className="field">
-              <label>Phone (optional)</label>
+              <label>Teléfono (opcional)</label>
               <input value={form.phone} onChange={(e) => update('phone', e.target.value)} />
             </div>
           </div>
@@ -70,10 +70,10 @@ export default function RegisterPage() {
 
           <div className="row" style={{ justifyContent: 'space-between', marginTop: 10 }}>
             <button className="btn primary" disabled={busy}>
-              {busy ? 'Creating…' : 'Create account'}
+              {busy ? 'Creando…' : 'Crear Cuenta'}
             </button>
             <Link className="muted" to="/login">
-              Already have an account?
+              ¿Ya tienes una cuenta?
             </Link>
           </div>
         </form>
