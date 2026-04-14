@@ -33,7 +33,7 @@ export default function RegisterPage() {
     <div className="container">
       <div className="card" style={{ maxWidth: 720, margin: '24px auto' }}>
         <h2>Crear una cuenta de usuario</h2>
-        <p className="muted">Un administrador debe aprobar su cuenta antes de que pueda enviar quejas.</p>
+        <p className="muted">Un administrador debe aprobar su cuenta antes de que pueda enviar reclamos.</p>
         <div style={{ height: 10 }} />
         <form onSubmit={onSubmit}>
           <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
