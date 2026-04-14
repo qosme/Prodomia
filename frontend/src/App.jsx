@@ -63,7 +63,7 @@ function AppNav() {
               </NavLink>
               <span className="pill">{user.username}</span>
               <button className="btn danger" onClick={logout}>
-                Logout
+                Cerrar Sesión
               </button>
             </>
           ) : (

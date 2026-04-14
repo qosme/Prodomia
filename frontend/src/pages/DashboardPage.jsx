@@ -61,17 +61,17 @@ export default function DashboardPage() {
         <div className="card">
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <div>
-              <h2 style={{ margin: 0 }}>Complaints</h2>
+              <h2 style={{ margin: 0 }}>Reclamos</h2>
               <div className="muted" style={{ marginTop: 6 }}>
                 {user?.role === 'manager'
-                  ? 'All complaints in the building'
+                  ? 'Todos los reclamos en el edificio'
                   : user?.role === 'staff'
-                    ? 'Complaints assigned to you'
-                    : 'Your complaints'}
+                    ? 'Reclamos asignados a ti'
+                    : 'Tus reclamos'}
               </div>
             </div>
             <button className="btn" onClick={load} disabled={busy}>
-              Refresh
+              Refrescar
             </button>
           </div>
 
@@ -82,9 +82,9 @@ export default function DashboardPage() {
             <>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <div className="row">
-                  <span className="pill">Total submitted: {items.length}</span>
+                  <span className="pill">Total enviados: {items.length}</span>
                   <span className={`pill ${user?.approved ? 'ok' : 'bad'}`}>
-                    {user?.approved ? 'approved' : 'pending'}
+                    {user?.approved ? 'aprobados' : 'pendientes'}
                   </span>
                 </div>
                 <div className="row" style={{ gap: 8 }}>
@@ -96,7 +96,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div style={{ height: 10 }} />
-              <h2 style={{ margin: '0 0 8px' }}>Recent updates</h2>
+              <h2 style={{ margin: '0 0 8px' }}>Actualizaciones recientes</h2>
               <div className="list">
                 {recentUpdates.map((u, idx) => (
                   <Link key={`${u.type}-${u.at}-${idx}`} className="item" to={`/complaints/${u.complaintId}`}>
@@ -111,7 +111,7 @@ export default function DashboardPage() {
                     </div>
                   </Link>
                 ))}
-                {recentUpdates.length === 0 && <div className="muted">No recent updates yet.</div>}
+                {recentUpdates.length === 0 && <div className="muted">Sin actualizaciones recientes.</div>}
               </div>
               <div style={{ height: 12 }} />
             </>
@@ -131,21 +131,20 @@ export default function DashboardPage() {
                 </div>
               </Link>
             ))}
-            {items.length === 0 && <div className="muted">No complaints yet.</div>}
+            {items.length === 0 && <div className="muted">Sin reclamos.</div>}
           </div>
         </div>
 
         <div className="card">
-          <h2 style={{ marginTop: 0 }}>Resident actions</h2>
+          <h2 style={{ marginTop: 0 }}>Escribir un reclamo</h2>
           {user?.role !== 'resident' ? (
-            <div className="muted">This panel is for residents only.</div>
+            <div className="muted">Este panel es solo para residentes.</div>
           ) : !user?.approved ? (
             <div>
-              <div className="pill bad">Not approved</div>
+              <div className="pill bad">No aprobado</div>
               <div style={{ height: 8 }} />
               <div className="muted">
-                You can browse your own complaints after approval. Ask the building manager to approve
-                your account.
+                Puedes hacer reclamos una vez que tu cuenta sea aprobada por el administrador.
               </div>
             </div>
           ) : (
@@ -153,12 +152,12 @@ export default function DashboardPage() {
           )}
 
           <div style={{ height: 14 }} />
-          <h2>Account</h2>
+          <h2>Cuenta</h2>
           <div className="row">
-            <span className="pill">{user?.role || '—'}</span>
+            <span className="pill">{user?.role === 'resident' ? 'residente' : user?.role || '—'}</span>
             {user?.role === 'resident' && (
               <span className={`pill ${user?.approved ? 'ok' : 'bad'}`}>
-                {user?.approved ? 'approved' : 'pending'}
+                {user?.approved ? 'aprobado' : 'pendiente'}
               </span>
             )}
           </div>
