@@ -144,6 +144,11 @@ select {
   box-sizing: border-box;
 }
 
+option {
+  background: #1e1e2e;
+  color: #e0e0e0;
+}
+
 textarea {
   min-height: 100px;
 }

@@ -60,7 +60,7 @@ export default function AdminStaffPage() {
           <h3 style={{ marginTop: 0 }}>Crear Miembro del Personal</h3>
           <form onSubmit={createStaff}>
             <div className="field">
-              <label>Username</label>
+              <label>Usuario</label>
               <input
                 required
                 value={form.username}
