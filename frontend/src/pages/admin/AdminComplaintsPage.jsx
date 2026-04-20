@@ -11,6 +11,15 @@ const STATUS_COLORS = {
   REJECTED: 'bad',
 }
 
+const STATUS_LABELS = {
+  NEW: 'Nuevo',
+  ASSIGNED: 'Asignado',
+  IN_PROGRESS: 'En Progreso',
+  RESOLVED: 'Resuelto',
+  REJECTED: 'Rechazado',
+  CLOSED: 'Cerrado',
+}
+
 const CATEGORIES = ['', 'Plumbing', 'Electrical', 'Cleaning', 'Security', 'Noise', 'Other']
 
 export default function AdminComplaintsPage() {
@@ -35,7 +44,7 @@ export default function AdminComplaintsPage() {
 
   return (
     <div>
-      <h2 className="admin-page-title">All Complaints</h2>
+      <h2 className="admin-page-title">Todos los Reclamos</h2>
       {error && <p className="error">{error}</p>}
 
       <div className="row" style={{ marginBottom: 16, gap: 12 }}>
@@ -46,7 +55,7 @@ export default function AdminComplaintsPage() {
             value={filterCat}
             onChange={(e) => setFilterCat(e.target.value)}
           >
-            {CATEGORIES.map((c) => <option key={c} value={c}>{c || 'All'}</option>)}
+            {CATEGORIES.map((c) => <option key={c} value={c}>{c || 'Todos'}</option>)}
           </select>
         </div>
         <div>
@@ -56,38 +65,38 @@ export default function AdminComplaintsPage() {
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
-            <option value="">All</option>
-            <option value="NEW">New</option>
-            <option value="ASSIGNED">Assigned</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="RESOLVED">Resolved</option>
-            <option value="REJECTED">Rejected</option>
-            <option value="CLOSED">Closed</option>
+            <option value="">Todos</option>
+            <option value="NEW">Nuevo</option>
+            <option value="ASSIGNED">Asignado</option>
+            <option value="IN_PROGRESS">En Progreso</option>
+            <option value="RESOLVED">Resuelto</option>
+            <option value="REJECTED">Rechazado</option>
+            <option value="CLOSED">Cerrado</option>
           </select>
         </div>
       </div>
 
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">Cargando…</p>
       ) : (
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Resident</th>
-                <th>Category</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Assigned To</th>
-                <th>Date</th>
+                <th>Título</th>
+                <th>Residente</th>
+                <th>Categoría</th>
+                <th>Ubicación</th>
+                <th>Estado</th>
+                <th>Asignado a</th>
+                <th>Fecha</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={7} className="muted" style={{ textAlign: 'center', padding: 20 }}>
-                    No complaints found.
+                    Sin reclamos.
                   </td>
                 </tr>
               )}
@@ -102,7 +111,7 @@ export default function AdminComplaintsPage() {
                   <td>{c.category || '—'}</td>
                   <td>{c.location || '—'}</td>
                   <td>
-                    <span className={`pill ${STATUS_COLORS[c.status] || ''}`}>{c.status}</span>
+                    <span className={`pill ${STATUS_COLORS[c.status] || ''}`}>{STATUS_LABELS[c.status] ?? c.status}</span>
                   </td>
                   <td>{c.assignment?.assigned_to_username || '—'}</td>
                   <td>{new Date(c.created_at).toLocaleDateString()}</td>

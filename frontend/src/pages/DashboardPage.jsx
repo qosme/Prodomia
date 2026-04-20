@@ -3,10 +3,19 @@ import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
 import { useAuth } from '../auth.jsx'
 
+const STATUS_LABELS = {
+  NEW: 'Nuevo',
+  ASSIGNED: 'Asignado',
+  IN_PROGRESS: 'En Progreso',
+  RESOLVED: 'Resuelto',
+  REJECTED: 'Rechazado',
+  CLOSED: 'Cerrado',
+}
+
 function StatusPill({ status }) {
   const ok = status === 'RESOLVED' || status === 'CLOSED'
   const bad = status === 'REJECTED'
-  return <span className={`pill ${ok ? 'ok' : bad ? 'bad' : ''}`}>{status}</span>
+  return <span className={`pill ${ok ? 'ok' : bad ? 'bad' : ''}`}>{STATUS_LABELS[status] ?? status}</span>
 }
 
 function computeUpdates(complaints) {
@@ -15,8 +24,8 @@ function computeUpdates(complaints) {
     const lastComment = (c.comments || []).slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0]
     const lastStatus = (c.status_history || []).slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0]
     const candidates = []
-    if (lastComment) candidates.push({ type: 'comment', at: lastComment.created_at, who: lastComment.author_username, text: `Commented on “${c.title}”` , complaintId: c.id })
-    if (lastStatus) candidates.push({ type: 'status', at: lastStatus.created_at, who: lastStatus.changed_by_username, text: `Status ${lastStatus.from_status} → ${lastStatus.to_status} on “${c.title}”`, complaintId: c.id })
+    if (lastComment) candidates.push({ type: 'comment', at: lastComment.created_at, who: lastComment.author_username, text: `Comentó en “${c.title}”` , complaintId: c.id })
+    if (lastStatus) candidates.push({ type: 'status', at: lastStatus.created_at, who: lastStatus.changed_by_username, text: `Estado ${STATUS_LABELS[lastStatus.from_status] ?? lastStatus.from_status} → ${STATUS_LABELS[lastStatus.to_status] ?? lastStatus.to_status} en “${c.title}”`, complaintId: c.id })
     for (const u of candidates) updates.push(u)
   }
   return updates.sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, 8)
@@ -90,7 +99,7 @@ export default function DashboardPage() {
                 <div className="row" style={{ gap: 8 }}>
                   {statusCounts.slice(0, 4).map(([s, n]) => (
                     <span key={s} className="pill">
-                      {s}: {n}
+                      {STATUS_LABELS[s] ?? s}: {n}
                     </span>
                   ))}
                 </div>
@@ -107,7 +116,7 @@ export default function DashboardPage() {
                       </span>
                     </div>
                     <div className="muted" style={{ fontSize: 13 }}>
-                      By {u.who || '—'}
+                      Por {u.who || '—'}
                     </div>
                   </Link>
                 ))}
@@ -127,7 +136,7 @@ export default function DashboardPage() {
                 <div className="muted" style={{ fontSize: 13 }}>
                   {c.category ? `${c.category} • ` : ''}
                   {c.location ? `${c.location} • ` : ''}
-                  {c.resident_username ? `By ${c.resident_username}` : ''}
+                  {c.resident_username ? `Por ${c.resident_username}` : ''}
                 </div>
               </Link>
             ))}

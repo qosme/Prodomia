@@ -5,10 +5,19 @@ import { useAuth } from '../auth.jsx'
 
 const STATUSES = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'CLOSED']
 
+const STATUS_LABELS = {
+  NEW: 'Nuevo',
+  ASSIGNED: 'Asignado',
+  IN_PROGRESS: 'En Progreso',
+  RESOLVED: 'Resuelto',
+  REJECTED: 'Rechazado',
+  CLOSED: 'Cerrado',
+}
+
 function StatusPill({ status }) {
   const ok = status === 'RESOLVED' || status === 'CLOSED'
   const bad = status === 'REJECTED'
-  return <span className={`pill ${ok ? 'ok' : bad ? 'bad' : ''}`}>{status}</span>
+  return <span className={`pill ${ok ? 'ok' : bad ? 'bad' : ''}`}>{STATUS_LABELS[status] ?? status}</span>
 }
 
 export default function ManagerDashboardPage() {
@@ -76,7 +85,7 @@ export default function ManagerDashboardPage() {
   if (user?.role !== 'manager') {
     return (
       <div className="container">
-        <div className="card">Manager only.</div>
+        <div className="card">Solo gestores.</div>
       </div>
     )
   }
@@ -86,13 +95,13 @@ export default function ManagerDashboardPage() {
       <div className="card">
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <div>
-            <h2 style={{ margin: 0 }}>Manager dashboard</h2>
+            <h2 style={{ margin: 0 }}>Panel del gestor</h2>
             <div className="muted" style={{ marginTop: 6 }}>
-              View all complaints, filter by category, update status, and assign staff.
+              Ver todos los reclamos, filtrar por categoría, actualizar estado y asignar personal.
             </div>
           </div>
           <button className="btn" onClick={load} disabled={busy}>
-            Refresh
+            Refrescar
           </button>
         </div>
 
@@ -102,11 +111,11 @@ export default function ManagerDashboardPage() {
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <div className="row">
             <span className="pill">Total: {complaints.length}</span>
-            <span className="pill">Filtered: {filtered.length}</span>
+            <span className="pill">Filtrados: {filtered.length}</span>
           </div>
           <div className="row" style={{ gap: 8 }}>
             <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="">All categories</option>
+              <option value="">Todas las categorías</option>
               {categories.map((c) => (
                 <option key={c} value={c}>
                   {c}
@@ -114,7 +123,7 @@ export default function ManagerDashboardPage() {
               ))}
             </select>
             <button className="btn" onClick={() => setCategory('')} disabled={!category}>
-              Clear
+              Limpiar
             </button>
           </div>
         </div>
@@ -129,7 +138,7 @@ export default function ManagerDashboardPage() {
                   <div className="muted" style={{ fontSize: 13 }}>
                     {c.category ? `${c.category} • ` : ''}
                     {c.location ? `${c.location} • ` : ''}
-                    By {c.resident_username}
+                    Por {c.resident_username}
                   </div>
                 </Link>
                 <StatusPill status={c.status} />
@@ -142,7 +151,7 @@ export default function ManagerDashboardPage() {
                     value={c.assignment?.assigned_to || ''}
                     onChange={(e) => assign(c.id, e.target.value)}
                   >
-                    <option value="">Assign staff…</option>
+                    <option value="">Asignar personal…</option>
                     {staffUsers.map((u) => (
                       <option key={u.id} value={u.id}>
                         {u.username}
@@ -150,7 +159,7 @@ export default function ManagerDashboardPage() {
                     ))}
                   </select>
                   <span className="muted" style={{ fontSize: 13 }}>
-                    Current: {c.assignment?.assigned_to_username || '—'}
+                    Actual: {c.assignment?.assigned_to_username || '—'}
                   </span>
                 </div>
 
@@ -161,7 +170,7 @@ export default function ManagerDashboardPage() {
                   >
                     {STATUSES.map((s) => (
                       <option key={s} value={s}>
-                        {s}
+                        {STATUS_LABELS[s] ?? s}
                       </option>
                     ))}
                   </select>
@@ -169,7 +178,7 @@ export default function ManagerDashboardPage() {
               </div>
             </div>
           ))}
-          {filtered.length === 0 && <div className="muted">No complaints match filters.</div>}
+          {filtered.length === 0 && <div className="muted">Sin reclamos que coincidan con los filtros.</div>}
         </div>
       </div>
     </div>

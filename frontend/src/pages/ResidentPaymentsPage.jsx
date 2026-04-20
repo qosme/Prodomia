@@ -3,9 +3,16 @@ import { useSearchParams } from 'react-router-dom'
 import { apiFetch } from '../api.js'
 
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ]
+
+const STATUS_LABELS = {
+  PAID: 'Pagado',
+  MANUAL: 'Pagado (Manual)',
+  PENDING: 'Pendiente',
+  FAILED: 'Fallido',
+}
 
 const STATUS_COLORS = {
   PAID: 'ok',
@@ -66,25 +73,25 @@ export default function ResidentPaymentsPage() {
       {result === 'success' && (
         <div className="card" style={{ borderColor: 'rgba(34,197,94,0.4)', marginBottom: 20 }}>
           <p className="success" style={{ margin: 0 }}>
-            Payment successful! Your fee has been registered.
+            ¡Pago exitoso! Tu cuota ha sido registrada.
           </p>
         </div>
       )}
       {result === 'cancelled' && (
         <div className="card" style={{ borderColor: 'rgba(239,68,68,0.4)', marginBottom: 20 }}>
-          <p className="error" style={{ margin: 0 }}>Payment cancelled.</p>
+          <p className="error" style={{ margin: 0 }}>Pago cancelado.</p>
         </div>
       )}
       {result === 'failed' && (
         <div className="card" style={{ borderColor: 'rgba(239,68,68,0.4)', marginBottom: 20 }}>
-          <p className="error" style={{ margin: 0 }}>Payment failed. Please try again.</p>
+          <p className="error" style={{ margin: 0 }}>Pago fallido. Por favor intenta de nuevo.</p>
         </div>
       )}
 
       {error && <p className="error">{error}</p>}
 
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">Cargando…</p>
       ) : (
         <div className="grid">
           <div>
@@ -97,13 +104,13 @@ export default function ResidentPaymentsPage() {
                     <span style={{ fontSize: 14, color: 'var(--muted)', marginLeft: 8 }}>CLP</span>
                   </div>
                   <p className="muted" style={{ margin: '0 0 4px' }}>
-                    {MONTHS[fee.period_month - 1]} {fee.period_year} · Unit {fee.unit}
+                    {MONTHS[fee.period_month - 1]} {fee.period_year} · Unidad {fee.unit}
                   </p>
                   <p className="muted" style={{ margin: '0 0 16px', fontSize: 13 }}>
-                    Due: {fee.due_date}
+                    Vencimiento: {fee.due_date}
                   </p>
                   {currentFeePaid ? (
-                    <span className="pill ok">Paid</span>
+                    <span className="pill ok">Pagado</span>
                   ) : (
                     <button
                       className="btn primary"
@@ -111,7 +118,7 @@ export default function ResidentPaymentsPage() {
                       disabled={paying}
                       style={{ fontSize: 15, padding: '12px 20px' }}
                     >
-                      {paying ? 'Redirecting to WebPay…' : 'Pay with WebPay Plus'}
+                      {paying ? 'Redirigiendo a WebPay…' : 'Pagar con WebPay Plus'}
                     </button>
                   )}
                 </>
@@ -136,7 +143,7 @@ export default function ResidentPaymentsPage() {
                             ? `${MONTHS[p.monthly_fee.period_month - 1]} ${p.monthly_fee.period_year}`
                             : '—'}
                         </strong>
-                        <span className={`pill ${STATUS_COLORS[p.status] || ''}`}>{p.status}</span>
+                        <span className={`pill ${STATUS_COLORS[p.status] || ''}`}>{STATUS_LABELS[p.status] ?? p.status}</span>
                       </div>
                       <div className="muted" style={{ fontSize: 13 }}>
                         ${Number(p.amount).toLocaleString('es-CL')} ·{' '}

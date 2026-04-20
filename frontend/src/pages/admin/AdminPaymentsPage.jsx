@@ -9,9 +9,16 @@ const STATUS_COLORS = {
 }
 
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ]
+
+const STATUS_LABELS = {
+  PAID: 'Pagado (WebPay)',
+  MANUAL: 'Pagado (Manual)',
+  PENDING: 'Pendiente',
+  FAILED: 'Fallido',
+}
 
 export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState([])
@@ -38,7 +45,7 @@ export default function AdminPaymentsPage() {
         method: 'POST',
         body: JSON.stringify({ notes }),
       })
-      setMsg('Payment marked as manually paid.')
+      setMsg('Pago registrado como pagado manualmente.')
       setMarkingId(null)
       setNotes('')
       loadPayments()
@@ -51,46 +58,46 @@ export default function AdminPaymentsPage() {
 
   return (
     <div>
-      <h2 className="admin-page-title">Payments</h2>
+      <h2 className="admin-page-title">Pagos</h2>
       {msg && <p className="success">{msg}</p>}
       {error && <p className="error">{error}</p>}
 
       <div className="row" style={{ marginBottom: 16 }}>
-        <label className="muted">Filter by status:</label>
+        <label className="muted">Filtrar por estado:</label>
         <select
           style={{ width: 'auto' }}
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
-          <option value="">All</option>
-          <option value="PENDING">Pending</option>
-          <option value="PAID">Paid (WebPay)</option>
-          <option value="MANUAL">Paid (Manual)</option>
-          <option value="FAILED">Failed</option>
+          <option value="">Todos</option>
+          <option value="PENDING">Pendiente</option>
+          <option value="PAID">Pagado (WebPay)</option>
+          <option value="MANUAL">Pagado (Manual)</option>
+          <option value="FAILED">Fallido</option>
         </select>
       </div>
 
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">Cargando…</p>
       ) : (
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Resident</th>
-                <th>Unit</th>
-                <th>Period</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Actions</th>
+                <th>Residente</th>
+                <th>Unidad</th>
+                <th>Período</th>
+                <th>Monto</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={7} className="muted" style={{ textAlign: 'center', padding: 20 }}>
-                    No payments found.
+                    Sin pagos registrados.
                   </td>
                 </tr>
               )}
@@ -106,7 +113,7 @@ export default function AdminPaymentsPage() {
                     </td>
                     <td>${Number(p.amount).toLocaleString('es-CL')}</td>
                     <td>
-                      <span className={`pill ${STATUS_COLORS[p.status] || ''}`}>{p.status}</span>
+                      <span className={`pill ${STATUS_COLORS[p.status] || ''}`}>{STATUS_LABELS[p.status] ?? p.status}</span>
                     </td>
                     <td>
                       {p.transaction_date
@@ -120,7 +127,7 @@ export default function AdminPaymentsPage() {
                           style={{ fontSize: 13, padding: '6px 10px' }}
                           onClick={() => setMarkingId(markingId === p.id ? null : p.id)}
                         >
-                          Mark Paid
+                          Marcar como Pagado
                         </button>
                       )}
                     </td>
@@ -130,16 +137,16 @@ export default function AdminPaymentsPage() {
                       <td colSpan={7}>
                         <div className="card" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                           <input
-                            placeholder="Notes (optional)"
+                            placeholder="Notas (opcional)"
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             style={{ flex: 1, minWidth: 200 }}
                           />
                           <button className="btn primary" onClick={() => markPaid(p.id)}>
-                            Confirm
+                            Confirmar
                           </button>
                           <button className="btn" onClick={() => setMarkingId(null)}>
-                            Cancel
+                            Cancelar
                           </button>
                         </div>
                       </td>
