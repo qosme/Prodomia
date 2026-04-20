@@ -22,13 +22,13 @@ export default function AdminOverviewPage() {
   }, [])
 
   const now = new Date()
-  const monthName = now.toLocaleString('default', { month: 'long', year: 'numeric' })
+  const monthName = now.toLocaleString('es-CL', { month: 'long', year: 'numeric' })
 
   return (
     <div>
-      <h2 className="admin-page-title">Overview</h2>
+      <h2 className="admin-page-title">Resumen</h2>
       <p className="muted" style={{ marginBottom: 24 }}>
-        {monthName} snapshot
+        {monthName}
       </p>
 
       {error && <p className="error">{error}</p>}
@@ -36,40 +36,40 @@ export default function AdminOverviewPage() {
       {stats ? (
         <div className="stat-grid">
           <StatCard
-            label="Active Units"
+            label="Unidades Activas"
             value={stats.total_units}
-            sub="approved residents"
+            sub="residentes aprobados"
           />
           <StatCard
-            label="Pending Approvals"
+            label="Aprobaciones Pendientes"
             value={stats.pending_approvals}
             accent={stats.pending_approvals > 0 ? 'warn' : null}
           />
           <StatCard
-            label="Open Complaints"
+            label="Reclamos Abiertos"
             value={stats.open_complaints}
             accent={stats.open_complaints > 0 ? 'warn' : null}
           />
           <StatCard
-            label="Fees Issued"
+            label="Cuotas Emitidas"
             value={stats.total_fees_this_month}
-            sub="this month"
+            sub="este mes"
           />
           <StatCard
-            label="Payments Received"
+            label="Pagos Recibidos"
             value={stats.paid_this_month}
-            sub="this month"
+            sub="este mes"
             accent="ok"
           />
           <StatCard
-            label="Revenue"
+            label="Ingresos"
             value={`$${stats.revenue_this_month.toLocaleString('es-CL')}`}
-            sub="this month (CLP)"
+            sub="este mes (CLP)"
             accent="ok"
           />
         </div>
       ) : (
-        !error && <p className="muted">Loading stats…</p>
+        !error && <p className="muted">Cargando estadísticas…</p>
       )}
     </div>
   )
