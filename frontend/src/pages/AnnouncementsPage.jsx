@@ -18,7 +18,7 @@ export default function AnnouncementsPage() {
       <h2>Anuncios</h2>
       {error && <p className="error">{error}</p>}
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">Cargando…</p>
       ) : announcements.length === 0 ? (
         <div className="card">
           <p className="muted" style={{ textAlign: 'center', margin: 0 }}>
