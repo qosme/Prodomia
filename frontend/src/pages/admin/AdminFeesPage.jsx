@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { apiFetch } from '../../api.js'
 
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ]
 
 export default function AdminFeesPage() {
@@ -45,7 +45,7 @@ export default function AdminFeesPage() {
           period_month: parseInt(form.period_month),
         }),
       })
-      setMsg('Monthly fee created.')
+      setMsg('Cuota mensual creada.')
       setForm({ unit: '', amount: '', period_year: now.getFullYear(), period_month: now.getMonth() + 1, due_date: '' })
       loadFees()
     } catch (err) {
@@ -56,10 +56,10 @@ export default function AdminFeesPage() {
   }
 
   const deleteFee = async (id) => {
-    if (!confirm('Delete this fee?')) return
+    if (!confirm('¿Eliminar esta cuota?')) return
     try {
       await apiFetch(`/payments/monthly-fees/${id}/`, { method: 'DELETE' })
-      setMsg('Fee deleted.')
+      setMsg('Cuota eliminada.')
       loadFees()
     } catch (e) {
       setError(e.message)
@@ -68,25 +68,25 @@ export default function AdminFeesPage() {
 
   return (
     <div>
-      <h2 className="admin-page-title">Monthly Fees</h2>
+      <h2 className="admin-page-title">Cuotas Mensuales</h2>
       {msg && <p className="success">{msg}</p>}
       {error && <p className="error">{error}</p>}
 
       <div className="card" style={{ marginBottom: 32 }}>
-        <h3 style={{ marginTop: 0 }}>Create Monthly Fee</h3>
+        <h3 style={{ marginTop: 0 }}>Crear Cuota Mensual</h3>
         <form onSubmit={createFee}>
           <div className="row">
             <div className="field" style={{ flex: 1 }}>
-              <label>Unit</label>
+              <label>Unidad</label>
               <input
                 required
-                placeholder="e.g. 101"
+                placeholder="ej. 101"
                 value={form.unit}
                 onChange={(e) => setForm({ ...form, unit: e.target.value })}
               />
             </div>
             <div className="field" style={{ flex: 1 }}>
-              <label>Amount (CLP)</label>
+              <label>Monto (CLP)</label>
               <input
                 type="number"
                 required
@@ -99,7 +99,7 @@ export default function AdminFeesPage() {
           </div>
           <div className="row">
             <div className="field" style={{ flex: 1 }}>
-              <label>Year</label>
+              <label>Año</label>
               <input
                 type="number"
                 required
@@ -108,7 +108,7 @@ export default function AdminFeesPage() {
               />
             </div>
             <div className="field" style={{ flex: 1 }}>
-              <label>Month</label>
+              <label>Mes</label>
               <select
                 value={form.period_month}
                 onChange={(e) => setForm({ ...form, period_month: e.target.value })}
@@ -119,7 +119,7 @@ export default function AdminFeesPage() {
               </select>
             </div>
             <div className="field" style={{ flex: 1 }}>
-              <label>Due Date</label>
+              <label>Fecha de Vencimiento</label>
               <input
                 type="date"
                 required
@@ -129,31 +129,31 @@ export default function AdminFeesPage() {
             </div>
           </div>
           <button className="btn primary" type="submit" disabled={creating}>
-            {creating ? 'Creating…' : 'Create Fee'}
+            {creating ? 'Creando…' : 'Crear Cuota'}
           </button>
         </form>
       </div>
 
-      <h3>All Monthly Fees</h3>
+      <h3>Todas las Cuotas Mensuales</h3>
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">Cargando…</p>
       ) : (
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Unit</th>
-                <th>Period</th>
-                <th>Amount</th>
-                <th>Due Date</th>
-                <th>Actions</th>
+                <th>Unidad</th>
+                <th>Período</th>
+                <th>Monto</th>
+                <th>Vencimiento</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {fees.length === 0 && (
                 <tr>
                   <td colSpan={5} className="muted" style={{ textAlign: 'center', padding: 20 }}>
-                    No fees created yet.
+                    Sin cuotas creadas aún.
                   </td>
                 </tr>
               )}
@@ -169,7 +169,7 @@ export default function AdminFeesPage() {
                       style={{ fontSize: 13, padding: '6px 10px' }}
                       onClick={() => deleteFee(f.id)}
                     >
-                      Delete
+                      Eliminar
                     </button>
                   </td>
                 </tr>

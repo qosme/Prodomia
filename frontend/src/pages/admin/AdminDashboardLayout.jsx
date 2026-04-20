@@ -9,50 +9,50 @@ export default function AdminDashboardLayout() {
   return (
     <div className="admin-layout">
       <aside className="admin-sidebar">
-        <div className="admin-sidebar-title">Admin Panel</div>
+        <div className="admin-sidebar-title">Panel Admin</div>
         <nav className="admin-nav">
           <NavLink
             to="/admin-dashboard"
             end
             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
           >
-            Overview
+            Resumen
           </NavLink>
           <NavLink
             to="/admin-dashboard/residents"
             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
           >
-            Residents
+            Residentes
           </NavLink>
           <NavLink
             to="/admin-dashboard/staff"
             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
           >
-            Staff
+            Personal
           </NavLink>
           <NavLink
             to="/admin-dashboard/fees"
             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
           >
-            Monthly Fees
+            Cuotas Mensuales
           </NavLink>
           <NavLink
             to="/admin-dashboard/payments"
             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
           >
-            Payments
+            Pagos
           </NavLink>
           <NavLink
             to="/admin-dashboard/announcements"
             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
           >
-            Announcements
+            Anuncios
           </NavLink>
           <NavLink
             to="/admin-dashboard/complaints"
             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
           >
-            Complaints
+            Reclamos
           </NavLink>
         </nav>
       </aside>

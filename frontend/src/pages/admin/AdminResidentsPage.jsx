@@ -23,7 +23,7 @@ export default function AdminResidentsPage() {
   const approve = async (id) => {
     try {
       await apiFetch(`/users/${id}/approve_resident/`, { method: 'POST' })
-      setMsg('Resident approved.')
+      setMsg('Residente aprobado.')
       loadResidents()
     } catch (e) {
       setError(e.message)
@@ -31,10 +31,10 @@ export default function AdminResidentsPage() {
   }
 
   const deactivate = async (id) => {
-    if (!confirm('Deactivate this user? They will no longer be able to log in.')) return
+    if (!confirm('¿Desactivar este usuario? Ya no podrá iniciar sesión.')) return
     try {
       await apiFetch(`/users/${id}/deactivate/`, { method: 'POST' })
-      setMsg('User deactivated.')
+      setMsg('Usuario desactivado.')
       loadResidents()
     } catch (e) {
       setError(e.message)
@@ -43,29 +43,29 @@ export default function AdminResidentsPage() {
 
   return (
     <div>
-      <h2 className="admin-page-title">Residents</h2>
+      <h2 className="admin-page-title">Residentes</h2>
       {msg && <p className="success">{msg}</p>}
       {error && <p className="error">{error}</p>}
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">Cargando…</p>
       ) : (
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Username</th>
+                <th>Usuario</th>
                 <th>Email</th>
-                <th>Unit</th>
-                <th>Phone</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>Unidad</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {users.length === 0 && (
                 <tr>
                   <td colSpan={6} className="muted" style={{ textAlign: 'center', padding: 20 }}>
-                    No residents found.
+                    Sin residentes.
                   </td>
                 </tr>
               )}
@@ -77,17 +77,17 @@ export default function AdminResidentsPage() {
                   <td>{u.resident_profile?.phone || '—'}</td>
                   <td>
                     <span className={`pill ${u.resident_profile?.is_approved ? 'ok' : 'bad'}`}>
-                      {u.resident_profile?.is_approved ? 'Approved' : 'Pending'}
+                      {u.resident_profile?.is_approved ? 'Aprobado' : 'Pendiente'}
                     </span>
                   </td>
                   <td className="row" style={{ gap: 6 }}>
                     {!u.resident_profile?.is_approved && (
                       <button className="btn primary" style={{ fontSize: 13, padding: '6px 10px' }} onClick={() => approve(u.id)}>
-                        Approve
+                        Aprobar
                       </button>
                     )}
                     <button className="btn danger" style={{ fontSize: 13, padding: '6px 10px' }} onClick={() => deactivate(u.id)}>
-                      Deactivate
+                      Desactivar
                     </button>
                   </td>
                 </tr>

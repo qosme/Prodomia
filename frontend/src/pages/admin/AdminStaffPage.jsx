@@ -28,7 +28,7 @@ export default function AdminStaffPage() {
         method: 'POST',
         body: JSON.stringify(form),
       })
-      setMsg(`Staff member "${form.username}" created.`)
+      setMsg(`Personal "${form.username}" creado.`)
       setForm({ username: '', email: '', password: '' })
       loadStaff()
     } catch (err) {
@@ -39,10 +39,10 @@ export default function AdminStaffPage() {
   }
 
   const deactivateStaff = async (id) => {
-    if (!confirm('Deactivate this staff member?')) return
+    if (!confirm('¿Desactivar este miembro del personal?')) return
     try {
       await apiFetch(`/users/${id}/deactivate_staff/`, { method: 'POST' })
-      setMsg('Staff member deactivated.')
+      setMsg('Miembro del personal desactivado.')
       loadStaff()
     } catch (e) {
       setError(e.message)
@@ -51,13 +51,13 @@ export default function AdminStaffPage() {
 
   return (
     <div>
-      <h2 className="admin-page-title">Staff Management</h2>
+      <h2 className="admin-page-title">Gestión de Personal</h2>
       {msg && <p className="success">{msg}</p>}
       {error && <p className="error">{error}</p>}
 
       <div className="grid" style={{ marginBottom: 32 }}>
         <div className="card">
-          <h3 style={{ marginTop: 0 }}>Create Staff Member</h3>
+          <h3 style={{ marginTop: 0 }}>Crear Miembro del Personal</h3>
           <form onSubmit={createStaff}>
             <div className="field">
               <label>Username</label>
@@ -76,7 +76,7 @@ export default function AdminStaffPage() {
               />
             </div>
             <div className="field">
-              <label>Password</label>
+              <label>Contraseña</label>
               <input
                 type="password"
                 required
@@ -86,31 +86,31 @@ export default function AdminStaffPage() {
               />
             </div>
             <button className="btn primary" type="submit" disabled={creating}>
-              {creating ? 'Creating…' : 'Create Staff'}
+              {creating ? 'Creando…' : 'Crear Personal'}
             </button>
           </form>
         </div>
       </div>
 
-      <h3>Current Staff</h3>
+      <h3>Personal Actual</h3>
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">Cargando…</p>
       ) : (
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Username</th>
+                <th>Usuario</th>
                 <th>Email</th>
-                <th>Active</th>
-                <th>Actions</th>
+                <th>Activo</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {staffList.length === 0 && (
                 <tr>
                   <td colSpan={4} className="muted" style={{ textAlign: 'center', padding: 20 }}>
-                    No staff members yet.
+                    Sin miembros del personal aún.
                   </td>
                 </tr>
               )}
@@ -120,7 +120,7 @@ export default function AdminStaffPage() {
                   <td>{u.email || '—'}</td>
                   <td>
                     <span className={`pill ${u.staff_profile?.is_active_staff ? 'ok' : 'bad'}`}>
-                      {u.staff_profile?.is_active_staff ? 'Active' : 'Inactive'}
+                      {u.staff_profile?.is_active_staff ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
                   <td>
@@ -130,7 +130,7 @@ export default function AdminStaffPage() {
                         style={{ fontSize: 13, padding: '6px 10px' }}
                         onClick={() => deactivateStaff(u.id)}
                       >
-                        Deactivate
+                        Desactivar
                       </button>
                     )}
                   </td>
