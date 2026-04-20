@@ -1,6 +1,7 @@
 import uuid
 
 from django.conf import settings
+from django.db.models.deletion import ProtectedError
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -27,6 +28,15 @@ from .serializers import (
 class MonthlyFeeViewSet(viewsets.ModelViewSet):
     queryset = MonthlyFee.objects.all().order_by("-period_year", "-period_month")
     serializer_class = MonthlyFeeSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            return Response(
+                {"detail": "No se puede eliminar esta cuota porque tiene pagos asociados."},
+                status=status.HTTP_409_CONFLICT,
+            )
 
     def get_permissions(self):
         if self.action == "my_fee":
