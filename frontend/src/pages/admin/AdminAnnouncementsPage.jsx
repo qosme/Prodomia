@@ -28,7 +28,7 @@ export default function AdminAnnouncementsPage() {
         method: 'POST',
         body: JSON.stringify(form),
       })
-      setMsg('Announcement published.')
+      setMsg('Anuncio publicado.')
       setForm({ title: '', body: '' })
       loadAnnouncements()
     } catch (err) {
@@ -39,10 +39,10 @@ export default function AdminAnnouncementsPage() {
   }
 
   const remove = async (id) => {
-    if (!confirm('Remove this announcement?')) return
+    if (!confirm('¿Eliminar este anuncio?')) return
     try {
       await apiFetch(`/payments/announcements/${id}/`, { method: 'DELETE' })
-      setMsg('Announcement removed.')
+      setMsg('Anuncio eliminado.')
       loadAnnouncements()
     } catch (e) {
       setError(e.message)
@@ -51,15 +51,15 @@ export default function AdminAnnouncementsPage() {
 
   return (
     <div>
-      <h2 className="admin-page-title">Announcements</h2>
+      <h2 className="admin-page-title">Anuncios</h2>
       {msg && <p className="success">{msg}</p>}
       {error && <p className="error">{error}</p>}
 
       <div className="card" style={{ marginBottom: 32 }}>
-        <h3 style={{ marginTop: 0 }}>New Announcement</h3>
+        <h3 style={{ marginTop: 0 }}>Nuevo Anuncio</h3>
         <form onSubmit={create}>
           <div className="field">
-            <label>Title</label>
+            <label>Título</label>
             <input
               required
               value={form.title}
@@ -67,7 +67,7 @@ export default function AdminAnnouncementsPage() {
             />
           </div>
           <div className="field">
-            <label>Message</label>
+            <label>Mensaje</label>
             <textarea
               required
               value={form.body}
@@ -75,31 +75,31 @@ export default function AdminAnnouncementsPage() {
             />
           </div>
           <button className="btn primary" type="submit" disabled={creating}>
-            {creating ? 'Publishing…' : 'Publish'}
+            {creating ? 'Publicando…' : 'Publicar'}
           </button>
         </form>
       </div>
 
-      <h3>Published Announcements</h3>
+      <h3>Anuncios Publicados</h3>
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">Cargando…</p>
       ) : (
         <div className="list">
           {announcements.length === 0 && (
-            <p className="muted">No announcements yet.</p>
+            <p className="muted">Sin anuncios aún.</p>
           )}
           {announcements.map((a) => (
             <div key={a.id} className="item" style={{ gap: 8 }}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <strong>{a.title}</strong>
                 <span className={`pill ${a.is_active ? 'ok' : 'bad'}`}>
-                  {a.is_active ? 'Active' : 'Removed'}
+                  {a.is_active ? 'Activo' : 'Eliminado'}
                 </span>
               </div>
               <p style={{ margin: '4px 0', whiteSpace: 'pre-wrap' }}>{a.body}</p>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <span className="muted" style={{ fontSize: 12 }}>
-                  By {a.created_by_username} · {new Date(a.created_at).toLocaleDateString()}
+                  Por {a.created_by_username} · {new Date(a.created_at).toLocaleDateString()}
                 </span>
                 {a.is_active && (
                   <button
@@ -107,7 +107,7 @@ export default function AdminAnnouncementsPage() {
                     style={{ fontSize: 13, padding: '5px 10px' }}
                     onClick={() => remove(a.id)}
                   >
-                    Remove
+                    Eliminar
                   </button>
                 )}
               </div>

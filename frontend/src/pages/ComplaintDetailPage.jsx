@@ -3,10 +3,19 @@ import { Link, useParams } from 'react-router-dom'
 import { apiFetch } from '../api'
 import { useAuth } from '../auth.jsx'
 
+const STATUS_LABELS = {
+  NEW: 'Nuevo',
+  ASSIGNED: 'Asignado',
+  IN_PROGRESS: 'En Progreso',
+  RESOLVED: 'Resuelto',
+  REJECTED: 'Rechazado',
+  CLOSED: 'Cerrado',
+}
+
 function StatusPill({ status }) {
   const ok = status === 'RESOLVED' || status === 'CLOSED'
   const bad = status === 'REJECTED'
-  return <span className={`pill ${ok ? 'ok' : bad ? 'bad' : ''}`}>{status}</span>
+  return <span className={`pill ${ok ? 'ok' : bad ? 'bad' : ''}`}>{STATUS_LABELS[status] ?? status}</span>
 }
 
 const STATUSES = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'CLOSED']
@@ -84,7 +93,7 @@ export default function ComplaintDetailPage() {
   if (!data && busy) {
     return (
       <div className="container">
-        <div className="card">Loading…</div>
+        <div className="card">Cargando…</div>
       </div>
     )
   }
@@ -93,10 +102,10 @@ export default function ComplaintDetailPage() {
     <div className="container">
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Link className="muted" to="/">
-          ← Back
+          ← Volver
         </Link>
         <button className="btn" onClick={load} disabled={busy}>
-          Refresh
+          Refrescar
         </button>
       </div>
 
@@ -113,7 +122,7 @@ export default function ComplaintDetailPage() {
                 <div className="muted" style={{ marginTop: 6 }}>
                   {data.category ? `${data.category} • ` : ''}
                   {data.location ? `${data.location} • ` : ''}
-                  By {data.resident_username}
+                  Por {data.resident_username}
                 </div>
               </div>
               <StatusPill status={data.status} />
@@ -123,7 +132,7 @@ export default function ComplaintDetailPage() {
             <div>{data.description}</div>
 
             <div style={{ height: 14 }} />
-            <h2>Photos</h2>
+            <h2>Fotos</h2>
             <div className="row">
               <input
                 type="file"
@@ -146,11 +155,11 @@ export default function ComplaintDetailPage() {
                   />
                 </a>
               ))}
-              {(!data.photos || data.photos.length === 0) && <div className="muted">No photos.</div>}
+              {(!data.photos || data.photos.length === 0) && <div className="muted">Sin fotos.</div>}
             </div>
 
             <div style={{ height: 14 }} />
-            <h2>Comments</h2>
+            <h2>Comentarios</h2>
             <div className="list">
               {data.comments?.map((c) => (
                 <div key={c.id} className="card" style={{ padding: 10, boxShadow: 'none', background: 'rgba(255,255,255,0.03)' }}>
@@ -164,58 +173,58 @@ export default function ComplaintDetailPage() {
                   <div>{c.body}</div>
                 </div>
               ))}
-              {(!data.comments || data.comments.length === 0) && <div className="muted">No comments.</div>}
+              {(!data.comments || data.comments.length === 0) && <div className="muted">Sin comentarios.</div>}
             </div>
 
             <div style={{ height: 10 }} />
             <form onSubmit={addComment}>
               <div className="field">
-                <label>Add comment</label>
+                <label>Agregar comentario</label>
                 <textarea value={comment} onChange={(e) => setComment(e.target.value)} />
               </div>
-              <button className="btn primary">Post comment</button>
+              <button className="btn primary">Publicar comentario</button>
             </form>
           </div>
 
           <div className="card">
-            <h2 style={{ marginTop: 0 }}>Assignment</h2>
+            <h2 style={{ marginTop: 0 }}>Asignación</h2>
             {data.assignment ? (
               <div className="row">
                 <span className="pill ok">{data.assignment.assigned_to_username}</span>
                 <span className="muted" style={{ fontSize: 12 }}>
-                  assigned
+                  asignado
                 </span>
               </div>
             ) : (
-              <div className="muted">Not assigned yet.</div>
+              <div className="muted">Sin asignar.</div>
             )}
 
             <div style={{ height: 14 }} />
-            <h2>Status</h2>
+            <h2>Estado</h2>
             {(canManage || canStaffUpdate) ? (
               <form onSubmit={setComplaintStatus}>
                 <div className="field">
-                  <label>Set status</label>
+                  <label>Cambiar estado</label>
                   <select value={status} onChange={(e) => setStatus(e.target.value)}>
                     {STATUSES.map((s) => (
                       <option key={s} value={s}>
-                        {s}
+                        {STATUS_LABELS[s] ?? s}
                       </option>
                     ))}
                   </select>
                 </div>
-                <button className="btn">Update status</button>
+                <button className="btn">Actualizar estado</button>
               </form>
             ) : (
-              <div className="muted">Only manager or assigned staff can update status.</div>
+              <div className="muted">Solo el gestor o personal asignado puede actualizar el estado.</div>
             )}
 
             <div style={{ height: 14 }} />
             {canManage && (
               <>
-                <h2>Manager actions</h2>
+                <h2>Acciones del gestor</h2>
                 <div className="muted">
-                  Use the Assign screen to assign this complaint to staff.
+                  Usa la pantalla de asignación para asignar este reclamo al personal.
                 </div>
               </>
             )}
