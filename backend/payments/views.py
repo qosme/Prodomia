@@ -47,7 +47,7 @@ class MonthlyFeeViewSet(viewsets.ModelViewSet):
     def my_fee(self, request):
         profile = getattr(request.user, "resident_profile", None)
         if not profile or not profile.is_approved:
-            return Response({"detail": "Not an approved resident."}, status=403)
+            return Response({"detail": "Residente no aprobado."}, status=403)
         now = timezone.now()
         fee = MonthlyFee.objects.filter(
             unit=profile.unit,
