@@ -3,6 +3,15 @@ import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
 import { useAuth } from '../auth.jsx'
 
+const STATUS_LABELS = {
+  NEW: 'Nuevo',
+  ASSIGNED: 'Asignado',
+  IN_PROGRESS: 'En Progreso',
+  RESOLVED: 'Resuelto',
+  REJECTED: 'Rechazado',
+  CLOSED: 'Cerrado',
+}
+
 export default function StaffAssignedPage() {
   const { user } = useAuth()
   const [items, setItems] = useState([])
@@ -16,7 +25,7 @@ export default function StaffAssignedPage() {
       const data = await apiFetch('/complaints/')
       setItems(data)
     } catch (err) {
-      setError(err.message || 'Failed to load assigned complaints')
+      setError(err.message || 'Error al cargar los reclamos asignados')
     } finally {
       setBusy(false)
     }
@@ -29,7 +38,7 @@ export default function StaffAssignedPage() {
   if (user?.role !== 'staff') {
     return (
       <div className="container">
-        <div className="card">Staff only.</div>
+        <div className="card">Solo para personal.</div>
       </div>
     )
   }
@@ -39,13 +48,13 @@ export default function StaffAssignedPage() {
       <div className="card">
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <div>
-            <h2 style={{ margin: 0 }}>Assigned to me</h2>
+            <h2 style={{ margin: 0 }}>Asignados a mí</h2>
             <div className="muted" style={{ marginTop: 6 }}>
-              Update status inside each complaint.
+              Actualiza el estado desde cada reclamo.
             </div>
           </div>
           <button className="btn" onClick={load} disabled={busy}>
-            Refresh
+            Refrescar
           </button>
         </div>
         <div style={{ height: 12 }} />
@@ -55,14 +64,14 @@ export default function StaffAssignedPage() {
             <Link key={c.id} className="item" to={`/complaints/${c.id}`}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <div style={{ fontWeight: 650 }}>{c.title}</div>
-                <span className="pill">{c.status}</span>
+                <span className="pill">{STATUS_LABELS[c.status] ?? c.status}</span>
               </div>
               <div className="muted" style={{ fontSize: 13 }}>
-                Resident: {c.resident_username} • Location: {c.location || '—'}
+                Residente: {c.resident_username} • Ubicación: {c.location || '—'}
               </div>
             </Link>
           ))}
-          {items.length === 0 && <div className="muted">No assigned complaints.</div>}
+          {items.length === 0 && <div className="muted">Sin reclamos asignados.</div>}
         </div>
       </div>
     </div>
