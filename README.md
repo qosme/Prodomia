@@ -1,22 +1,11 @@
-# Sistema de Reclamos de Condominio (Django + React + Postgres)
+# Prodomia (Django + React + Postgres)
 
-Los residentes pueden registrarse, ser **aprobados por un administrador**, enviar reclamos con fotos, comentar y hacer seguimiento del estado. Los administradores pueden aprobar residentes, asignar reclamos al personal de mantenimiento y actualizar estados. El personal de mantenimiento puede ver los reclamos asignados y actualizar su estado.
+Los residentes pueden registrarse, ser aprobados por un administrador, enviar reclamos con fotos, comentar y hacer seguimiento del estado. Los administradores pueden aprobar residentes, asignar reclamos al personal de mantenimiento y actualizar estados. El personal de mantenimiento puede ver los reclamos asignados y actualizar su estado.
 
 ## Ejecución local
 
 ### Backend (API REST con Django)
 
-Desde la raíz del repositorio:
-
-Con Docker:
-- Clonar el repositorio y verificar que Docker esté corriendo
-- `docker-compose up --build -d`
-- Verificar que los contenedores estén corriendo con `docker ps` en la terminal
-Aplicar migraciones y crear superusuario:
-- `docker-compose exec web python manage.py migrate`
-- `docker-compose exec web python manage.py createsuperuser` (admin)
-
-Sin Docker:
 - Copiar el entorno:
   - `backend/.env.example` → `backend/.env`
 - Instalar dependencias:
@@ -31,15 +20,21 @@ Sin Docker:
 
 URL base de la API: `http://localhost:8000/api`
 
-### Base de datos (Postgres, opcional)
+### Base de datos (Postgres)
 
-Si tienes Docker corriendo:
+En `backend/.env`, configurar `DATABASE_URL` según la opción elegida:
 
-- `docker compose up -d`
-- En `backend/.env`, configurar `DATABASE_URL=postgres://condo:condo@localhost:5432/condo`
-- Luego volver a ejecutar las migraciones.
+**Supabase:**
+- Crear un proyecto en [supabase.com](https://supabase.com)
+- Ir a **Settings -> Database -> Connection string** y copiar la URI
+- Pegarla en `DATABASE_URL` del `.env`
 
-Si Docker no está corriendo, el backend usará SQLite por defecto.
+- Si esto no funciona, ir a Connect -> Direct -> Session Pooler y copiar la URI (agregando la contraseña de la Base de Datos)
+- Pegarla en `DATABASE_URL` del `.env`
+
+**Postgres local:**
+- Instalar Postgres y crear una base de datos
+- Configurar `DATABASE_URL=postgres://usuario:contraseña@localhost:5432/nombre_db`
 
 ### Frontend (React + Vite)
 
