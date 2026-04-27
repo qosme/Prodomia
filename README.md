@@ -1,65 +1,65 @@
-# Condo Complaint System (Django + React + Postgres)
+# Sistema de Reclamos de Condominio (Django + React + Postgres)
 
-Residents can register, get **approved by a manager**, submit complaints with photos, comment, and track status. Managers can approve residents, assign complaints to maintenance staff, and update statuses. Maintenance staff can see assigned complaints and update their status.
+Los residentes pueden registrarse, ser **aprobados por un administrador**, enviar reclamos con fotos, comentar y hacer seguimiento del estado. Los administradores pueden aprobar residentes, asignar reclamos al personal de mantenimiento y actualizar estados. El personal de mantenimiento puede ver los reclamos asignados y actualizar su estado.
 
-## Local run
+## Ejecución local
 
-### Backend (Django REST API)
+### Backend (API REST con Django)
 
-From repo root:
+Desde la raíz del repositorio:
 
-As it's using Docker:
-- clone repository and check that docker is running
-- docker-compose up --build -d
-- check that containers are running with 'docker ps' in terminal
-Apply migrations and create superuser:
-- docker-compose exec web python manage.py migrate
-- docker-compose exec web python manage.py createsuperuser (admin)
+Con Docker:
+- Clonar el repositorio y verificar que Docker esté corriendo
+- `docker-compose up --build -d`
+- Verificar que los contenedores estén corriendo con `docker ps` en la terminal
+Aplicar migraciones y crear superusuario:
+- `docker-compose exec web python manage.py migrate`
+- `docker-compose exec web python manage.py createsuperuser` (admin)
 
-Without Docker:
-- Copy env:
+Sin Docker:
+- Copiar el entorno:
   - `backend/.env.example` → `backend/.env`
-- Install deps:
+- Instalar dependencias:
   - `cd backend`
   - `python -m pip install -r requirements.txt`
-- Migrate + create admin:
+- Migrar + crear admin:
   - `python manage.py makemigrations`
   - `python manage.py migrate`
   - `python manage.py createsuperuser`
-- Run:
+- Ejecutar:
   - `python manage.py runserver`
 
-API base URL: `http://localhost:8000/api`
+URL base de la API: `http://localhost:8000/api`
 
-### Database (Postgres, optional)
+### Base de datos (Postgres, opcional)
 
-If you have Docker running:
+Si tienes Docker corriendo:
 
 - `docker compose up -d`
-- In `backend/.env`, set `DATABASE_URL=postgres://condo:condo@localhost:5432/condo`
-- Then rerun migrations.
+- En `backend/.env`, configurar `DATABASE_URL=postgres://condo:condo@localhost:5432/condo`
+- Luego volver a ejecutar las migraciones.
 
-If Docker is not running, backend will default to SQLite.
+Si Docker no está corriendo, el backend usará SQLite por defecto.
 
 ### Frontend (React + Vite)
 
-From repo root:
+Desde la raíz del repositorio:
 
-- Copy env:
+- Copiar el entorno:
   - `frontend/.env.example` → `frontend/.env`
-- Install deps + run:
+- Instalar dependencias y ejecutar:
   - `cd frontend`
   - `npm install`
   - `npm run dev`
 
 Frontend: `http://localhost:5173`
 
-## First-use flow
+## Flujo de primer uso
 
-- Register as resident in the UI (`/register`)
-- Log into Django admin at `http://localhost:8000/admin/` as the superuser
-  - Approve residents via the **Approvals** page in the React UI after logging in as a manager user (staff/superuser)
-  - You can also create staff users and then call manager endpoint `POST /api/users/:id/make_staff/`
-- As an approved resident: submit a complaint
-- As manager: assign complaint to a staff user
-- As staff: open the complaint and update status
+- Registrarse como residente en la UI (`/register`)
+- Iniciar sesión en el admin de Django en `http://localhost:8000/admin/` como superusuario
+  - Aprobar residentes desde la página de **Aprobaciones** en la UI de React luego de iniciar sesión como administrador (staff/superusuario)
+  - También puedes crear usuarios staff y luego llamar al endpoint de administrador `POST /api/users/:id/make_staff/`
+- Como residente aprobado: enviar un reclamo
+- Como administrador: asignar el reclamo a un usuario del staff
+- Como staff: abrir el reclamo y actualizar el estado
