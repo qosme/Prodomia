@@ -4,13 +4,10 @@ import LoginPage from './pages/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import ComplaintDetailPage from './pages/ComplaintDetailPage.jsx'
-import ManagerDashboardPage from './pages/ManagerDashboardPage.jsx'
-import ManagerApprovalsPage from './pages/ManagerApprovalsPage.jsx'
-import ManagerAssignPage from './pages/ManagerAssignPage.jsx'
-import ManagerStaffPage from './pages/ManagerStaffPage.jsx'
 import StaffAssignedPage from './pages/StaffAssignedPage.jsx'
 import AnnouncementsPage from './pages/AnnouncementsPage.jsx'
 import ResidentPaymentsPage from './pages/ResidentPaymentsPage.jsx'
+import ResidentComplaintsPage from './pages/ResidentComplaintsPage.jsx'
 import AdminDashboardLayout from './pages/admin/AdminDashboardLayout.jsx'
 import AdminOverviewPage from './pages/admin/AdminOverviewPage.jsx'
 import AdminResidentsPage from './pages/admin/AdminResidentsPage.jsx'
@@ -30,6 +27,7 @@ function Guarded({ children }) {
 function AppNav() {
   const { user, logout } = useAuth()
   const role = user?.role
+  const hasResidentProfile = user?.resident_profile != null
 
   return (
     <div className="nav">
@@ -40,9 +38,19 @@ function AppNav() {
         <div className="tabs">
           {user ? (
             <>
-              <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/">
-                Dashboard
+              <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/" end>
+                {role === 'staff' ? 'Dashboard' : 'Inicio'}
               </NavLink>
+              {(role === 'resident' || (role === 'manager' && hasResidentProfile)) && (
+                <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/complaints">
+                  Mis Reclamos
+                </NavLink>
+              )}
+              {(role === 'resident' || (role === 'manager' && hasResidentProfile)) && (
+                <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/payments">
+                  Mis Pagos
+                </NavLink>
+              )}
               {role === 'manager' && (
                 <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/admin-dashboard">
                   Administración
@@ -51,11 +59,6 @@ function AppNav() {
               {role === 'staff' && (
                 <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/staff/assigned">
                   Asignadas
-                </NavLink>
-              )}
-              {role === 'resident' && (
-                <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/payments">
-                  Pagos
                 </NavLink>
               )}
               <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/announcements">
@@ -93,15 +96,11 @@ export default function App() {
         <Route path="/" element={<Guarded><DashboardPage /></Guarded>} />
         <Route path="/complaints/:id" element={<Guarded><ComplaintDetailPage /></Guarded>} />
 
-        {/* Legacy manager routes (kept for backwards compat) */}
-        <Route path="/manager/approvals" element={<Guarded><ManagerApprovalsPage /></Guarded>} />
-        <Route path="/manager" element={<Guarded><ManagerDashboardPage /></Guarded>} />
-        <Route path="/manager/assign" element={<Guarded><ManagerAssignPage /></Guarded>} />
-        <Route path="/manager/staff" element={<Guarded><ManagerStaffPage /></Guarded>} />
 
         <Route path="/staff/assigned" element={<Guarded><StaffAssignedPage /></Guarded>} />
 
         {/* Resident pages */}
+        <Route path="/complaints" element={<Guarded><ResidentComplaintsPage /></Guarded>} />
         <Route path="/payments" element={<Guarded><ResidentPaymentsPage /></Guarded>} />
         <Route path="/announcements" element={<Guarded><AnnouncementsPage /></Guarded>} />
 

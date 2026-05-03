@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
 import { useAuth } from '../auth.jsx'
+import ResidentHomePage from './ResidentHomePage.jsx'
+import ManagerHomePage from './ManagerHomePage.jsx'
 
 const STATUS_LABELS = {
   NEW: 'Nuevo',
@@ -33,6 +35,8 @@ function computeUpdates(complaints) {
 
 export default function DashboardPage() {
   const { user, refreshMe } = useAuth()
+  if (user?.role === 'resident') return <ResidentHomePage />
+  if (user?.role === 'manager') return <ManagerHomePage />
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
