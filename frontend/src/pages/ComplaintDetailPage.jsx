@@ -199,24 +199,48 @@ export default function ComplaintDetailPage() {
               <div className="muted">Sin asignar.</div>
             )}
 
-            <div style={{ height: 14 }} />
-            <h2>Estado</h2>
-            {(canManage || canStaffUpdate) ? (
-              <form onSubmit={setComplaintStatus}>
-                <div className="field">
-                  <label>Cambiar estado</label>
-                  <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                    {STATUSES.map((s) => (
-                      <option key={s} value={s}>
-                        {STATUS_LABELS[s] ?? s}
-                      </option>
+            {(canManage || canStaffUpdate) && (
+              <>
+                <div style={{ height: 14 }} />
+                <h2>Estado</h2>
+                <form onSubmit={setComplaintStatus}>
+                  <div className="field">
+                    <label>Cambiar estado</label>
+                    <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                      {STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {STATUS_LABELS[s] ?? s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button className="btn">Actualizar estado</button>
+                </form>
+              </>
+            )}
+
+            {data.status_history?.length > 0 && (
+              <>
+                <div style={{ height: 14 }} />
+                <h2 style={{ margin: '0 0 10px' }}>Historial</h2>
+                <div className="list">
+                  {[...data.status_history]
+                    .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+                    .map((h) => (
+                      <div key={h.id} className="item" style={{ cursor: 'default' }}>
+                        <div className="row" style={{ gap: 6 }}>
+                          <span className="pill">{STATUS_LABELS[h.from_status] ?? h.from_status}</span>
+                          <span className="muted" style={{ fontSize: 13 }}>→</span>
+                          <span className="pill ok">{STATUS_LABELS[h.to_status] ?? h.to_status}</span>
+                        </div>
+                        <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+                          {new Date(h.created_at).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}
+                          {h.changed_by_username ? ` · ${h.changed_by_username}` : ''}
+                        </div>
+                      </div>
                     ))}
-                  </select>
                 </div>
-                <button className="btn">Actualizar estado</button>
-              </form>
-            ) : (
-              <div className="muted">Solo el gestor o personal asignado puede actualizar el estado.</div>
+              </>
             )}
 
             <div style={{ height: 14 }} />

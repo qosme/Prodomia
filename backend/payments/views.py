@@ -83,6 +83,47 @@ class PaymentViewSet(
         ).order_by("-created_at")
         return Response(PaymentSerializer(qs, many=True).data)
 
+    @action(detail=False, methods=["post"], url_path="create_manual")
+    def create_manual(self, request):
+        if not is_manager(request.user):
+            return Response({"detail": "Solo los gestores pueden registrar pagos manuales."}, status=403)
+
+        fee_id = request.data.get("monthly_fee_id")
+        notes = request.data.get("notes", "")
+
+        if not fee_id:
+            return Response({"detail": "monthly_fee_id es requerido."}, status=400)
+
+        try:
+            fee = MonthlyFee.objects.get(pk=fee_id)
+        except MonthlyFee.DoesNotExist:
+            return Response({"detail": "Cuota no encontrada."}, status=404)
+
+        already_paid = Payment.objects.filter(
+            monthly_fee=fee,
+            status__in=[Payment.Status.PAID, Payment.Status.MANUAL],
+        ).exists()
+        if already_paid:
+            return Response({"detail": "Esta cuota ya está pagada."}, status=400)
+
+        from condo_app.models import ResidentProfile
+        profile = ResidentProfile.objects.filter(
+            unit=fee.unit, is_approved=True
+        ).select_related("user").first()
+        if not profile:
+            return Response({"detail": "No se encontró un residente aprobado para esta unidad."}, status=404)
+
+        payment = Payment.objects.create(
+            resident=profile.user,
+            monthly_fee=fee,
+            amount=fee.amount,
+            status=Payment.Status.MANUAL,
+            marked_paid_by=request.user,
+            notes=notes,
+            transaction_date=timezone.now(),
+        )
+        return Response(PaymentSerializer(payment).data, status=status.HTTP_201_CREATED)
+
     @action(detail=True, methods=["post"], url_path="mark_paid")
     def mark_paid(self, request, pk=None):
         if not is_manager(request.user):
