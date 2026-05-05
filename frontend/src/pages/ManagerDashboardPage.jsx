@@ -100,9 +100,6 @@ export default function ManagerDashboardPage() {
               Ver todos los reclamos, filtrar por categoría, actualizar estado y asignar personal.
             </div>
           </div>
-          <button className="btn" onClick={load} disabled={busy}>
-            Refrescar
-          </button>
         </div>
 
         <div style={{ height: 12 }} />

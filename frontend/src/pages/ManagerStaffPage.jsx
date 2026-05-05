@@ -91,7 +91,6 @@ export default function ManagerStaffPage() {
               <h2 style={{ margin: 0 }}>Staff users</h2>
               <div className="muted" style={{ marginTop: 6 }}>Assignable staff list.</div>
             </div>
-            <button className="btn" onClick={load}>Refresh</button>
           </div>
           <div style={{ height: 12 }} />
           <div className="list">

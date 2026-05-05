@@ -12,6 +12,7 @@ export default function AdminFeesPage() {
   const [fees, setFees] = useState([])
   const [units, setUnits] = useState([])
   const [loading, setLoading] = useState(true)
+  const [unitsLoading, setUnitsLoading] = useState(true)
   const [msg, setMsg] = useState('')
   const [error, setError] = useState('')
   const now = new Date()
@@ -43,6 +44,7 @@ export default function AdminFeesPage() {
         setUnits(Array.from(unitSet).sort())
       })
       .catch(() => {})
+      .finally(() => setUnitsLoading(false))
   }, [])
 
   const createFee = async (e) => {
@@ -58,12 +60,18 @@ export default function AdminFeesPage() {
     }
     try {
       if (form.unit === ALL_UNITS) {
-        await Promise.all(
+        const results = await Promise.allSettled(
           units.map((unit) =>
             apiFetch('/payments/monthly-fees/', { method: 'POST', body: JSON.stringify({ ...base, unit }) })
           )
         )
-        setMsg(`Cuotas creadas para ${units.length} unidades.`)
+        const created = results.filter((r) => r.status === 'fulfilled').length
+        const skipped = results.length - created
+        setMsg(
+          skipped > 0
+            ? `Cuotas creadas: ${created}. Omitidas (ya existían): ${skipped}.`
+            : `Cuotas creadas para ${created} unidades.`
+        )
       } else {
         await apiFetch('/payments/monthly-fees/', {
           method: 'POST',
@@ -103,26 +111,22 @@ export default function AdminFeesPage() {
           <div className="row">
             <div className="field" style={{ flex: 1 }}>
               <label>Unidad</label>
-              {units.length > 0 ? (
-                <select
-                  required
-                  value={form.unit}
-                  onChange={(e) => setForm({ ...form, unit: e.target.value })}
-                >
-                  <option value="">— Seleccionar unidad —</option>
+              <select
+                required
+                disabled={unitsLoading}
+                value={form.unit}
+                onChange={(e) => setForm({ ...form, unit: e.target.value })}
+              >
+                <option value="">
+                  {unitsLoading ? 'Cargando unidades…' : '— Seleccionar unidad —'}
+                </option>
+                {!unitsLoading && (
                   <option value={ALL_UNITS}>Todas las unidades ({units.length})</option>
-                  {units.map((u) => (
-                    <option key={u} value={u}>{u}</option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  required
-                  placeholder="ej. 101"
-                  value={form.unit}
-                  onChange={(e) => setForm({ ...form, unit: e.target.value })}
-                />
-              )}
+                )}
+                {units.map((u) => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </select>
             </div>
             <div className="field" style={{ flex: 1 }}>
               <label>Monto (CLP)</label>

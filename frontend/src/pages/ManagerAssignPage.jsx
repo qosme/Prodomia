@@ -68,9 +68,6 @@ export default function ManagerAssignPage() {
                 Select a complaint and assign it to a maintenance staff user.
               </div>
             </div>
-            <button className="btn" onClick={load} disabled={busy}>
-              Refresh
-            </button>
           </div>
 
           <div style={{ height: 12 }} />

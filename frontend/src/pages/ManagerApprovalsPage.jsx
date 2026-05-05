@@ -52,9 +52,6 @@ export default function ManagerApprovalsPage() {
               Approve residents so they can submit complaints.
             </div>
           </div>
-          <button className="btn" onClick={load} disabled={busy}>
-            Refresh
-          </button>
         </div>
         <div style={{ height: 12 }} />
         {error && <div className="error">{error}</div>}
