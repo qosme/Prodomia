@@ -19,19 +19,11 @@ def _get_options():
 
 
 def init_transaction(buy_order: str, session_id: str, amount: int, return_url: str) -> dict:
-    """
-    Creates a Transbank WebPay Plus transaction.
-    Returns a dict with 'token' and 'url' keys.
-    """
     tx = Transaction(_get_options())
     response = tx.create(buy_order, session_id, amount, return_url)
     return {"token": response["token"], "url": response["url"]}
 
 
 def confirm_transaction(token: str):
-    """
-    Commits a Transbank WebPay Plus transaction.
-    Returns the full response object from Transbank.
-    """
     tx = Transaction(_get_options())
     return tx.commit(token)

@@ -1,7 +1,6 @@
 import uuid
 
 from django.conf import settings
-from django.db.models.deletion import ProtectedError
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -9,54 +8,16 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from condo_app.models import ResidentProfile
 from condo_app.permissions import IsManager, is_approved_resident, is_manager
 
-from .models import Announcement, MonthlyFee, Payment
-from .serializers import (
-    AnnouncementSerializer,
-    MonthlyFeeSerializer,
-    PaymentMarkPaidSerializer,
-    PaymentSerializer,
-    WebpayInitSerializer,
-)
-
-
-class MonthlyFeeViewSet(viewsets.ModelViewSet):
-    queryset = MonthlyFee.objects.all().order_by("-period_year", "-period_month")
-    serializer_class = MonthlyFeeSerializer
-
-    def destroy(self, request, *args, **kwargs):
-        try:
-            return super().destroy(request, *args, **kwargs)
-        except ProtectedError:
-            return Response(
-                {"detail": "No se puede eliminar esta cuota porque tiene pagos asociados."},
-                status=status.HTTP_409_CONFLICT,
-            )
-
-    def get_permissions(self):
-        if self.action == "my_fee":
-            return [IsAuthenticated()]
-        return [IsAuthenticated(), IsManager()]
-
-    @action(detail=False, methods=["get"], url_path="my_fee")
-    def my_fee(self, request):
-        profile = getattr(request.user, "resident_profile", None)
-        if not profile or not profile.is_approved:
-            return Response({"detail": "Residente no aprobado."}, status=403)
-        now = timezone.now()
-        fee = MonthlyFee.objects.filter(
-            unit=profile.unit,
-            period_year=now.year,
-            period_month=now.month,
-        ).first()
-        if not fee:
-            return Response(None)
-        return Response(MonthlyFeeSerializer(fee).data)
+from ..models import MonthlyFee, Payment
+from ..serializers import PaymentMarkPaidSerializer, PaymentSerializer, WebpayInitSerializer
+from ..services.transbank import confirm_transaction, init_transaction
 
 
 class PaymentViewSet(
@@ -78,9 +39,11 @@ class PaymentViewSet(
 
     @action(detail=False, methods=["get"], url_path="my_payments")
     def my_payments(self, request):
-        qs = Payment.objects.filter(resident=request.user).select_related(
-            "monthly_fee"
-        ).order_by("-created_at")
+        qs = (
+            Payment.objects.filter(resident=request.user)
+            .select_related("monthly_fee")
+            .order_by("-created_at")
+        )
         return Response(PaymentSerializer(qs, many=True).data)
 
     @action(detail=False, methods=["post"], url_path="create_manual")
@@ -106,12 +69,13 @@ class PaymentViewSet(
         if already_paid:
             return Response({"detail": "Esta cuota ya está pagada."}, status=400)
 
-        from condo_app.models import ResidentProfile
         profile = ResidentProfile.objects.filter(
             unit=fee.unit, is_approved=True
         ).select_related("user").first()
         if not profile:
-            return Response({"detail": "No se encontró un residente aprobado para esta unidad."}, status=404)
+            return Response(
+                {"detail": "No se encontró un residente aprobado para esta unidad."}, status=404
+            )
 
         payment = Payment.objects.create(
             resident=profile.user,
@@ -127,7 +91,7 @@ class PaymentViewSet(
     @action(detail=True, methods=["post"], url_path="mark_paid")
     def mark_paid(self, request, pk=None):
         if not is_manager(request.user):
-            return Response({"detail": "Only managers can mark payments as paid."}, status=403)
+            return Response({"detail": "Solo los gestores pueden marcar pagos como pagados."}, status=403)
         payment = self.get_object()
         ser = PaymentMarkPaidSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -138,37 +102,12 @@ class PaymentViewSet(
         return Response(PaymentSerializer(payment).data)
 
 
-class AnnouncementViewSet(viewsets.ModelViewSet):
-    serializer_class = AnnouncementSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        if is_manager(user):
-            return Announcement.objects.all().order_by("-created_at")
-        return Announcement.objects.filter(is_active=True).order_by("-created_at")
-
-    def get_permissions(self):
-        if self.action in ("create", "update", "partial_update", "destroy"):
-            return [IsAuthenticated(), IsManager()]
-        return [IsAuthenticated()]
-
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
-
-    def destroy(self, request, *args, **kwargs):
-        announcement = self.get_object()
-        announcement.is_active = False
-        announcement.save(update_fields=["is_active", "updated_at"])
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class WebpayInitView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         if not is_approved_resident(request.user):
-            return Response({"detail": "Only approved residents can make payments."}, status=403)
+            return Response({"detail": "Solo los residentes aprobados pueden realizar pagos."}, status=403)
 
         ser = WebpayInitSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -177,11 +116,11 @@ class WebpayInitView(APIView):
         try:
             fee = MonthlyFee.objects.get(pk=fee_id)
         except MonthlyFee.DoesNotExist:
-            return Response({"detail": "Monthly fee not found."}, status=404)
+            return Response({"detail": "Cuota mensual no encontrada."}, status=404)
 
         profile = request.user.resident_profile
         if fee.unit != profile.unit:
-            return Response({"detail": "This fee does not belong to your unit."}, status=403)
+            return Response({"detail": "Esta cuota no pertenece a tu unidad."}, status=403)
 
         existing_paid = Payment.objects.filter(
             resident=request.user,
@@ -189,12 +128,10 @@ class WebpayInitView(APIView):
             status__in=[Payment.Status.PAID, Payment.Status.MANUAL],
         ).exists()
         if existing_paid:
-            return Response({"detail": "This fee is already paid."}, status=400)
+            return Response({"detail": "Esta cuota ya está pagada."}, status=400)
 
         buy_order = f"BO-{uuid.uuid4().hex[:16]}"
         session_id = f"SID-{request.user.id}-{fee.id}"
-
-        from .transbank_service import init_transaction
 
         return_url = settings.TRANSBANK_RETURN_URL
         try:
@@ -220,7 +157,6 @@ class WebpayCallbackView(View):
     def _handle(self, request):
         frontend_url = getattr(settings, "FRONTEND_URL", "http://localhost:5173")
 
-        # User cancelled before paying
         tbk_token = request.GET.get("TBK_TOKEN") or request.POST.get("TBK_TOKEN")
         if tbk_token:
             Payment.objects.filter(token=tbk_token).update(status=Payment.Status.FAILED)
@@ -229,8 +165,6 @@ class WebpayCallbackView(View):
         token_ws = request.POST.get("token_ws") or request.GET.get("token_ws")
         if not token_ws:
             return HttpResponseRedirect(f"{frontend_url}/payments?result=failed")
-
-        from .transbank_service import confirm_transaction
 
         try:
             response = confirm_transaction(token_ws)
@@ -243,16 +177,22 @@ class WebpayCallbackView(View):
         except Payment.DoesNotExist:
             return HttpResponseRedirect(f"{frontend_url}/payments?result=failed")
 
-        response_code = response.get("response_code") if isinstance(response, dict) else getattr(response, "response_code", None)
+        response_code = (
+            response.get("response_code")
+            if isinstance(response, dict)
+            else getattr(response, "response_code", None)
+        )
 
         if response_code == 0:
             payment.status = Payment.Status.PAID
             payment.authorization_code = (
-                response.get("authorization_code", "") if isinstance(response, dict)
+                response.get("authorization_code", "")
+                if isinstance(response, dict)
                 else getattr(response, "authorization_code", "")
             )
             payment.payment_type_code = (
-                response.get("payment_type_code", "") if isinstance(response, dict)
+                response.get("payment_type_code", "")
+                if isinstance(response, dict)
                 else getattr(response, "payment_type_code", "")
             )
             payment.transaction_date = timezone.now()
@@ -273,50 +213,3 @@ class WebpayCallbackView(View):
 
     def post(self, request):
         return self._handle(request)
-
-
-class DashboardStatsView(APIView):
-    permission_classes = [IsAuthenticated, IsManager]
-
-    def get(self, request):
-        from django.contrib.auth import get_user_model
-        from django.db.models import Count, Sum
-        from condo_app.models import Complaint, ResidentProfile
-
-        User = get_user_model()
-
-        now = timezone.now()
-
-        total_units = (
-            ResidentProfile.objects.filter(is_approved=True)
-            .values("unit")
-            .distinct()
-            .count()
-        )
-        pending_approvals = ResidentProfile.objects.filter(is_approved=False).count()
-        open_complaints = Complaint.objects.exclude(
-            status__in=["RESOLVED", "CLOSED", "REJECTED"]
-        ).count()
-
-        fees_this_month = MonthlyFee.objects.filter(
-            period_year=now.year,
-            period_month=now.month,
-        )
-        total_fees = fees_this_month.count()
-
-        paid_payments = Payment.objects.filter(
-            monthly_fee__period_year=now.year,
-            monthly_fee__period_month=now.month,
-            status__in=[Payment.Status.PAID, Payment.Status.MANUAL],
-        )
-        paid_count = paid_payments.count()
-        revenue = paid_payments.aggregate(total=Sum("amount"))["total"] or 0
-
-        return Response({
-            "total_units": total_units,
-            "pending_approvals": pending_approvals,
-            "open_complaints": open_complaints,
-            "total_fees_this_month": total_fees,
-            "paid_this_month": paid_count,
-            "revenue_this_month": float(revenue),
-        })

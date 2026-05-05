@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../../api.js'
+import PasswordInput from '../../components/PasswordInput.jsx'
 
 export default function AdminStaffPage() {
   const [staffList, setStaffList] = useState([])
@@ -77,12 +78,12 @@ export default function AdminStaffPage() {
             </div>
             <div className="field">
               <label>Contraseña</label>
-              <input
-                type="password"
+              <PasswordInput
                 required
                 minLength={8}
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
+                autoComplete="new-password"
               />
             </div>
             <button className="btn primary" type="submit" disabled={creating}>

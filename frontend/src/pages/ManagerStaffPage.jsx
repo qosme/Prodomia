@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../api'
 import { useAuth } from '../auth.jsx'
+import PasswordInput from '../components/PasswordInput.jsx'
 
 export default function ManagerStaffPage() {
   const { user } = useAuth()
@@ -74,7 +75,7 @@ export default function ManagerStaffPage() {
             </div>
             <div className="field">
               <label>Temporary password</label>
-              <input type="password" value={form.password} onChange={(e) => update('password', e.target.value)} required />
+              <PasswordInput value={form.password} onChange={(e) => update('password', e.target.value)} required autoComplete="new-password" />
             </div>
             {error && <div className="error">{error}</div>}
             {success && <div className="success">{success}</div>}

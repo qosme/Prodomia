@@ -16,6 +16,7 @@ import AdminFeesPage from './pages/admin/AdminFeesPage.jsx'
 import AdminPaymentsPage from './pages/admin/AdminPaymentsPage.jsx'
 import AdminAnnouncementsPage from './pages/admin/AdminAnnouncementsPage.jsx'
 import AdminComplaintsPage from './pages/admin/AdminComplaintsPage.jsx'
+import UserSettingsPage from './pages/UserSettingsPage.jsx'
 
 function Guarded({ children }) {
   const { user, loading } = useAuth()
@@ -64,7 +65,9 @@ function AppNav() {
               <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/announcements">
                 Anuncios
               </NavLink>
-              <span className="pill">{user.username}</span>
+              <NavLink className={({ isActive }) => `pill pill-btn ${isActive ? 'pill-btn-active' : ''}`} to="/settings">
+                {user.username}
+              </NavLink>
               <button className="btn danger" onClick={logout}>
                 Cerrar Sesión
               </button>
@@ -103,6 +106,7 @@ export default function App() {
         <Route path="/complaints" element={<Guarded><ResidentComplaintsPage /></Guarded>} />
         <Route path="/payments" element={<Guarded><ResidentPaymentsPage /></Guarded>} />
         <Route path="/announcements" element={<Guarded><AnnouncementsPage /></Guarded>} />
+        <Route path="/settings" element={<Guarded><UserSettingsPage /></Guarded>} />
 
         {/* Admin dashboard (nested routes with sidebar layout) */}
         <Route

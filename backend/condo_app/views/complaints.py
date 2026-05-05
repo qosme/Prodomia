@@ -1,126 +1,25 @@
-from django.contrib.auth import get_user_model
 from django.db import transaction
-from rest_framework import mixins, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .models import (
+from ..models import (
     Complaint,
     ComplaintAssignment,
     ComplaintComment,
     ComplaintPhoto,
     ComplaintStatusHistory,
-    ResidentProfile,
-    StaffProfile,
 )
-from .permissions import IsManager, is_manager, is_staff_user, is_approved_resident
-from .serializers import (
+from ..permissions import is_approved_resident, is_manager, is_staff_user
+from ..serializers import (
     AddCommentSerializer,
     AssignComplaintSerializer,
     ComplaintCreateSerializer,
     ComplaintSerializer,
-    CreateStaffSerializer,
-    RegisterSerializer,
     SetStatusSerializer,
-    UserSerializer,
 )
-
-User = get_user_model()
-
-
-class RegisterView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
-
-
-class MeView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = request.user
-        role = "resident"
-        approved = False
-        if is_manager(user):
-            role = "manager"
-            approved = True
-        elif is_staff_user(user):
-            role = "staff"
-            approved = True
-        else:
-            profile = getattr(user, "resident_profile", None)
-            approved = bool(profile and profile.is_approved)
-        data = UserSerializer(user).data
-        data["role"] = role
-        data["approved"] = approved
-        return Response(data)
-
-
-class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    permission_classes = [IsAuthenticated, IsManager]
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        return User.objects.all().order_by("id")
-
-    @action(detail=False, methods=["get"])
-    def pending_residents(self, request):
-        users = (
-            User.objects.filter(resident_profile__is_approved=False)
-            .select_related("resident_profile")
-            .order_by("id")
-        )
-        return Response(UserSerializer(users, many=True).data)
-
-    @action(detail=True, methods=["post"])
-    def approve_resident(self, request, pk=None):
-        user = self.get_object()
-        profile, _ = ResidentProfile.objects.get_or_create(user=user)
-        profile.is_approved = True
-        profile.save(update_fields=["is_approved"])
-        return Response(UserSerializer(user).data)
-
-    @action(detail=True, methods=["post"])
-    def make_staff(self, request, pk=None):
-        user = self.get_object()
-        StaffProfile.objects.get_or_create(user=user)
-        return Response(UserSerializer(user).data)
-
-    @action(detail=False, methods=["get"])
-    def staff(self, request):
-        users = User.objects.filter(staff_profile__isnull=False).select_related("staff_profile").order_by("id")
-        return Response(UserSerializer(users, many=True).data)
-
-    @action(detail=False, methods=["post"])
-    def create_staff(self, request):
-        serializer = CreateStaffSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
-
-    @action(detail=True, methods=["post"])
-    def deactivate(self, request, pk=None):
-        user = self.get_object()
-        user.is_active = False
-        user.save(update_fields=["is_active"])
-        return Response(UserSerializer(user).data)
-
-    @action(detail=True, methods=["post"])
-    def deactivate_staff(self, request, pk=None):
-        user = self.get_object()
-        profile = getattr(user, "staff_profile", None)
-        if profile:
-            profile.is_active_staff = False
-            profile.save(update_fields=["is_active_staff"])
-        return Response(UserSerializer(user).data)
 
 
 class ComplaintViewSet(viewsets.ModelViewSet):
@@ -152,7 +51,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         if not is_approved_resident(request.user):
             return Response(
-                {"detail": "Resident not approved yet."},
+                {"detail": "Tu cuenta aún no ha sido aprobada."},
                 status=status.HTTP_403_FORBIDDEN,
             )
         serializer = self.get_serializer(data=request.data)
@@ -181,7 +80,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         complaint = self.get_object()
         image = request.FILES.get("image")
         if not image:
-            return Response({"detail": "Missing file 'image'."}, status=400)
+            return Response({"detail": "Falta el archivo 'image'."}, status=400)
         ComplaintPhoto.objects.create(
             complaint=complaint,
             image=image,
@@ -193,7 +92,7 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def assign(self, request, pk=None):
         if not is_manager(request.user):
-            return Response({"detail": "Only manager can assign."}, status=403)
+            return Response({"detail": "Solo el gestor puede asignar reclamos."}, status=403)
         complaint = self.get_object()
         ser = AssignComplaintSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -225,11 +124,15 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         allowed = False
         if is_manager(user):
             allowed = True
-        elif is_staff_user(user) and getattr(complaint, "assignment", None) and complaint.assignment.assigned_to_id == user.id:
+        elif (
+            is_staff_user(user)
+            and getattr(complaint, "assignment", None)
+            and complaint.assignment.assigned_to_id == user.id
+        ):
             allowed = True
 
         if not allowed:
-            return Response({"detail": "Not allowed to change status."}, status=403)
+            return Response({"detail": "No tienes permiso para cambiar el estado."}, status=403)
 
         ser = SetStatusSerializer(data=request.data)
         ser.is_valid(raise_exception=True)

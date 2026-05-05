@@ -22,8 +22,8 @@ export function AuthProvider({ children }) {
     refreshMe()
   }, [])
 
-  async function login(username, password) {
-    await apiLogin(username, password)
+  async function login(email, password) {
+    await apiLogin(email, password)
     await refreshMe()
   }
 
