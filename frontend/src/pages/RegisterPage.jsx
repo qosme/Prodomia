@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../api'
+import PasswordInput from '../components/PasswordInput.jsx'
 
 export default function RegisterPage() {
   const nav = useNavigate()
@@ -42,17 +43,13 @@ export default function RegisterPage() {
               <input value={form.username} onChange={(e) => update('username', e.target.value)} />
             </div>
             <div className="field">
-              <label>Email (opcional)</label>
-              <input value={form.email} onChange={(e) => update('email', e.target.value)} />
+              <label>Correo Electrónico</label>
+              <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} required autoComplete="email" />
             </div>
           </div>
           <div className="field">
             <label>Contraseña</label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => update('password', e.target.value)}
-            />
+            <PasswordInput value={form.password} onChange={(e) => update('password', e.target.value)} autoComplete="new-password" required />
           </div>
           <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="field">

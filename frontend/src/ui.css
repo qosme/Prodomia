@@ -216,6 +216,65 @@ textarea {
   font-size: 14px;
 }
 
+/* ── Clickable pill in navbar ── */
+.pill-btn {
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 4px 10px;
+  border-radius: 999px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.pill-btn:hover,
+.pill-btn-active {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+}
+
+/* ── Password input with visibility toggle ── */
+.password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrap input {
+  padding-right: 40px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.password-toggle:hover {
+  color: var(--text);
+}
+
+/* ── Settings page ── */
+.settings-section-title {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 /* ── Admin Dashboard Layout ── */
 .admin-layout {
   display: grid;
