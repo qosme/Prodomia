@@ -53,9 +53,6 @@ export default function StaffAssignedPage() {
               Actualiza el estado desde cada reclamo.
             </div>
           </div>
-          <button className="btn" onClick={load} disabled={busy}>
-            Refrescar
-          </button>
         </div>
         <div style={{ height: 12 }} />
         {error && <div className="error">{error}</div>}

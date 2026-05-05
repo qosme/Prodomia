@@ -15,6 +15,17 @@ class MonthlyFeeViewSet(viewsets.ModelViewSet):
     queryset = MonthlyFee.objects.all().order_by("-period_year", "-period_month")
     serializer_class = MonthlyFeeSerializer
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as exc:
+            if hasattr(exc, 'detail') and 'non_field_errors' in getattr(exc, 'detail', {}):
+                return Response(
+                    {"detail": "Ya existe una cuota para esta unidad en el período seleccionado."},
+                    status=status.HTTP_409_CONFLICT,
+                )
+            raise
+
     def destroy(self, request, *args, **kwargs):
         try:
             return super().destroy(request, *args, **kwargs)

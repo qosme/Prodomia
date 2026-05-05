@@ -100,11 +100,6 @@ export default function ComplaintDetailPage() {
 
   return (
     <div className="container">
-      <div className="row" style={{ justifyContent: 'flex-end' }}>
-        <button className="btn" onClick={load} disabled={busy}>
-          Refrescar
-        </button>
-      </div>
 
       <div style={{ height: 12 }} />
 

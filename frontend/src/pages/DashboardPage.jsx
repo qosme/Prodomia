@@ -83,9 +83,6 @@ export default function DashboardPage() {
                     : 'Tus reclamos'}
               </div>
             </div>
-            <button className="btn" onClick={load} disabled={busy}>
-              Refrescar
-            </button>
           </div>
 
           <div style={{ height: 12 }} />

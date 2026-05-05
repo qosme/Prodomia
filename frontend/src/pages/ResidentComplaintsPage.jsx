@@ -51,7 +51,6 @@ export default function ResidentComplaintsPage() {
         <div className="card">
           <div className="row" style={{ justifyContent: 'space-between', marginBottom: 12 }}>
             <h2 style={{ margin: 0 }}>Mis Reclamos</h2>
-            <button className="btn" onClick={load} disabled={busy}>Refrescar</button>
           </div>
           {error && <div className="error">{error}</div>}
           <div className="list">
