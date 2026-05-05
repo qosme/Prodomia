@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { apiFetch } from '../api'
 import { useAuth } from '../auth.jsx'
 
@@ -100,10 +100,7 @@ export default function ComplaintDetailPage() {
 
   return (
     <div className="container">
-      <div className="row" style={{ justifyContent: 'space-between' }}>
-        <Link className="muted" to="/">
-          ← Volver
-        </Link>
+      <div className="row" style={{ justifyContent: 'flex-end' }}>
         <button className="btn" onClick={load} disabled={busy}>
           Refrescar
         </button>
