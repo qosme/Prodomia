@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../api.js'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 
 const STATUS_LABELS = {
   NEW: 'Nuevo',
