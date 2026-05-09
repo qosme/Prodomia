@@ -1,4 +1,4 @@
-# Prodomia (Django + React + Postgres)
+# Prodomia
 
 Los residentes pueden registrarse, ser aprobados por un administrador, enviar reclamos con fotos, comentar y hacer seguimiento del estado. Los administradores pueden aprobar residentes, asignar reclamos al personal de mantenimiento y actualizar estados. El personal de mantenimiento puede ver los reclamos asignados y actualizar su estado.
 
