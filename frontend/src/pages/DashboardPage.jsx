@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 import ResidentHomePage from './ResidentHomePage.jsx'
 import ManagerHomePage from './ManagerHomePage.jsx'
 
@@ -35,13 +35,9 @@ function computeUpdates(complaints) {
 
 export default function DashboardPage() {
   const { user, refreshMe } = useAuth()
-  if (user?.role === 'resident') return <ResidentHomePage />
-  if (user?.role === 'manager') return <ManagerHomePage />
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
 
-  const canCreate = useMemo(() => user?.role === 'resident' && user?.approved, [user])
   const statusCounts = useMemo(() => {
     const m = new Map()
     for (const c of items) m.set(c.status, (m.get(c.status) || 0) + 1)
@@ -51,14 +47,11 @@ export default function DashboardPage() {
 
   async function load() {
     setError('')
-    setBusy(true)
     try {
       const data = await apiFetch('/complaints/')
       setItems(data)
     } catch (err) {
       setError(err.message || 'Failed to load complaints')
-    } finally {
-      setBusy(false)
     }
   }
 
@@ -67,6 +60,9 @@ export default function DashboardPage() {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  if (user?.role === 'resident') return <ResidentHomePage />
+  if (user?.role === 'manager') return <ManagerHomePage />
 
   return (
     <div className="container">

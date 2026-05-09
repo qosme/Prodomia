@@ -1,5 +1,5 @@
 import { NavLink, Navigate, Outlet, Route, Routes } from 'react-router-dom'
-import { useAuth } from './auth.jsx'
+import { useAuth } from './useAuth.js'
 import LoginPage from './pages/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'

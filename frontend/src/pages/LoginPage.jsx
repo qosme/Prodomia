@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 import PasswordInput from '../components/PasswordInput.jsx'
 
 export default function LoginPage() {

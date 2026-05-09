@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 import PasswordInput from '../components/PasswordInput.jsx'
 
 export default function ManagerStaffPage() {

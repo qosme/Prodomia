@@ -44,7 +44,12 @@ export default function AdminPaymentsPage() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    Promise.all([apiFetch('/payments/payments/'), apiFetch('/payments/monthly-fees/')])
+      .then(([p, f]) => { setPayments(p); setFees(f) })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false))
+  }, [])
 
   const markPaid = async (id) => {
     try {

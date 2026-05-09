@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 
 const STATUS_LABELS = {
   NEW: 'Nuevo',
@@ -16,23 +16,10 @@ export default function StaffAssignedPage() {
   const { user } = useAuth()
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
-
-  async function load() {
-    setError('')
-    setBusy(true)
-    try {
-      const data = await apiFetch('/complaints/')
-      setItems(data)
-    } catch (err) {
-      setError(err.message || 'Error al cargar los reclamos asignados')
-    } finally {
-      setBusy(false)
-    }
-  }
-
   useEffect(() => {
-    load()
+    apiFetch('/complaints/')
+      .then(data => setItems(data))
+      .catch(err => setError(err.message || 'Error al cargar los reclamos asignados'))
   }, [])
 
   if (user?.role !== 'staff') {

@@ -18,7 +18,12 @@ export default function AdminResidentsPage() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { loadResidents() }, [])
+  useEffect(() => {
+    apiFetch('/users/')
+      .then((data) => setUsers(data.filter((u) => u.resident_profile != null)))
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false))
+  }, [])
 
   const approve = async (id) => {
     try {

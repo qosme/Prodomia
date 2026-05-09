@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 import { changePassword } from '../api'
 import PasswordInput from '../components/PasswordInput.jsx'
 
