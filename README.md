@@ -7,7 +7,7 @@ Los residentes pueden registrarse, ser aprobados por un administrador, enviar re
 ### Backend (API REST con Django)
 
 - Copiar el entorno:
-  - `backend/.env.example` → `backend/.env`
+  - `backend/.env.example` -> `backend/.env`
 - Instalar dependencias:
   - `cd backend`
   - `python -m pip install -r requirements.txt`
@@ -41,7 +41,7 @@ En `backend/.env`, configurar `DATABASE_URL` según la opción elegida:
 Desde la raíz del repositorio:
 
 - Copiar el entorno:
-  - `frontend/.env.example` → `frontend/.env`
+  - `frontend/.env.example` -> `frontend/.env`
 - Instalar dependencias y ejecutar:
   - `cd frontend`
   - `npm install`
