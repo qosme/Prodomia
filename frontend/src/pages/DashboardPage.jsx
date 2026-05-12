@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
 import { useAuth } from '../useAuth.js'
@@ -27,7 +28,7 @@ function computeUpdates(complaints) {
     const lastStatus = (c.status_history || []).slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0]
     const candidates = []
     if (lastComment) candidates.push({ type: 'comment', at: lastComment.created_at, who: lastComment.author_username, text: `Comentó en “${c.title}”` , complaintId: c.id })
-    if (lastStatus) candidates.push({ type: 'status', at: lastStatus.created_at, who: lastStatus.changed_by_username, text: `Estado ${STATUS_LABELS[lastStatus.from_status] ?? lastStatus.from_status} → ${STATUS_LABELS[lastStatus.to_status] ?? lastStatus.to_status} en “${c.title}”`, complaintId: c.id })
+    if (lastStatus) candidates.push({ type: 'status', at: lastStatus.created_at, who: lastStatus.changed_by_username, text: `Estado ${STATUS_LABELS[lastStatus.from_status] ?? lastStatus.from_status} -> ${STATUS_LABELS[lastStatus.to_status] ?? lastStatus.to_status} en “${c.title}”`, complaintId: c.id })
     for (const u of candidates) updates.push(u)
   }
   return updates.sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, 8)

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { ArrowRight } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { apiFetch } from '../api'
 import { useAuth } from '../useAuth.js'
@@ -225,7 +226,7 @@ export default function ComplaintDetailPage() {
                       <div key={h.id} className="item" style={{ cursor: 'default' }}>
                         <div className="row" style={{ gap: 6 }}>
                           <span className="pill">{STATUS_LABELS[h.from_status] ?? h.from_status}</span>
-                          <span className="muted" style={{ fontSize: 13 }}>→</span>
+                          <ArrowRight size={14} className="muted" />
                           <span className="pill ok">{STATUS_LABELS[h.to_status] ?? h.to_status}</span>
                         </div>
                         <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
