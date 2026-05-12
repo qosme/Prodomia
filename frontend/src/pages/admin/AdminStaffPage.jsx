@@ -118,7 +118,7 @@ export default function AdminStaffPage() {
               {staffList.map((u) => (
                 <tr key={u.id}>
                   <td>{u.username}</td>
-                  <td>{u.email || '—'}</td>
+                  <td>{u.email || '-'}</td>
                   <td>
                     <span className={`pill ${u.staff_profile?.is_active_staff ? 'ok' : 'bad'}`}>
                       {u.staff_profile?.is_active_staff ? 'Activo' : 'Inactivo'}

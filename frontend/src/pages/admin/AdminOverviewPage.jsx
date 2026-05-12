@@ -4,7 +4,7 @@ import { apiFetch } from '../../api.js'
 function StatCard({ label, value, sub, accent }) {
   return (
     <div className={`stat-card ${accent ? 'accent-' + accent : ''}`}>
-      <div className="stat-value">{value ?? '—'}</div>
+      <div className="stat-value">{value ?? '-'}</div>
       <div className="stat-label">{label}</div>
       {sub && <div className="stat-sub">{sub}</div>}
     </div>

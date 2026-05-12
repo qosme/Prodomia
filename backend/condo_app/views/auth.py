@@ -31,7 +31,7 @@ class _EmailTokenSerializer(BaseTokenObtainPairSerializer):
                 self.error_messages["no_active_account"],
                 "no_active_account",
             )
-        # Inject the resolved username so the parent's authenticate() call works normally
+        # Inyectar el nombre de usuario para que el serializer pueda validar la contraseña
         attrs[self.username_field] = user.username
         return super().validate(attrs)
 

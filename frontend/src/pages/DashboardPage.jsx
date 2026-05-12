@@ -55,6 +55,9 @@ export default function DashboardPage() {
     }
   }
 
+  // Se ejecuta una vez al montar el componente para obtener el usuario y los reclamos.
+  // load y refreshMe se omiten de las dependencias intencionalmente
+  // ya que agregarlos haría que el effecto se volviera a ejecutar en cada render, ya que se recrean cada vez.
   useEffect(() => {
     refreshMe()
     load()
@@ -109,11 +112,11 @@ export default function DashboardPage() {
                     <div className="row" style={{ justifyContent: 'space-between' }}>
                       <div style={{ fontWeight: 650 }}>{u.text}</div>
                       <span className="muted" style={{ fontSize: 12 }}>
-                        {new Date(u.at).toLocaleString()}
+                        {new Date(u.at).toLocaleString('es-CL')}
                       </span>
                     </div>
                     <div className="muted" style={{ fontSize: 13 }}>
-                      Por {u.who || '—'}
+                      Por {u.who || '-'}
                     </div>
                   </Link>
                 ))}
@@ -160,7 +163,7 @@ export default function DashboardPage() {
           <div style={{ height: 14 }} />
           <h2>Cuenta</h2>
           <div className="row">
-            <span className="pill">{user?.role === 'resident' ? 'residente' : user?.role || '—'}</span>
+            <span className="pill">{user?.role === 'resident' ? 'residente' : user?.role || '-'}</span>
             {user?.role === 'resident' && (
               <span className={`pill ${user?.approved ? 'ok' : 'bad'}`}>
                 {user?.approved ? 'aprobado' : 'pendiente'}

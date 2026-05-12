@@ -51,7 +51,7 @@ export default function StaffAssignedPage() {
                 <span className="pill">{STATUS_LABELS[c.status] ?? c.status}</span>
               </div>
               <div className="muted" style={{ fontSize: 13 }}>
-                Residente: {c.resident_username} • Ubicación: {c.location || '—'}
+                Residente: {c.resident_username} • Ubicación: {c.location || '-'}
               </div>
             </Link>
           ))}

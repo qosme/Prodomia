@@ -60,12 +60,12 @@ export default function ManagerHomePage() {
     {
       to: '/admin-dashboard',
       title: 'Resumen',
-      subtitle: loading ? '…' : stats ? `${stats.total_units} unidades activas` : '—',
+      subtitle: loading ? '…' : stats ? `${stats.total_units} unidades activas` : '-',
     },
     {
       to: '/admin-dashboard/residents',
       title: 'Residentes',
-      subtitle: loading ? '…' : stats ? `${stats.pending_approvals} pendiente${stats.pending_approvals !== 1 ? 's' : ''}` : '—',
+      subtitle: loading ? '…' : stats ? `${stats.pending_approvals} pendiente${stats.pending_approvals !== 1 ? 's' : ''}` : '-',
       borderColor: stats?.pending_approvals > 0 ? 'rgba(234, 179, 8, 0.45)' : undefined,
     },
     {
@@ -77,14 +77,14 @@ export default function ManagerHomePage() {
     {
       to: '/admin-dashboard/staff',
       title: 'Personal',
-      subtitle: loading ? '…' : `${activeStaff ?? '—'} activo${activeStaff !== 1 ? 's' : ''}`,
+      subtitle: loading ? '…' : `${activeStaff ?? '-'} activo${activeStaff !== 1 ? 's' : ''}`,
     },
     {
       to: '/admin-dashboard/fees',
       title: 'Cuotas',
       subtitle: loading ? '…' : stats
         ? `${stats.total_fees_this_month - stats.paid_this_month} pendiente${(stats.total_fees_this_month - stats.paid_this_month) !== 1 ? 's' : ''} este mes`
-        : '—',
+        : '-',
       borderColor: stats && (stats.total_fees_this_month - stats.paid_this_month) > 0
         ? 'rgba(239, 68, 68, 0.35)'
         : undefined,
@@ -92,12 +92,12 @@ export default function ManagerHomePage() {
     {
       to: '/admin-dashboard/payments',
       title: 'Pagos',
-      subtitle: loading ? '…' : stats ? `${stats.paid_this_month} pagado${stats.paid_this_month !== 1 ? 's' : ''} este mes` : '—',
+      subtitle: loading ? '…' : stats ? `${stats.paid_this_month} pagado${stats.paid_this_month !== 1 ? 's' : ''} este mes` : '-',
     },
     {
       to: '/admin-dashboard/announcements',
       title: 'Anuncios',
-      subtitle: loading ? '…' : `${announcementCount ?? '—'} publicado${announcementCount !== 1 ? 's' : ''}`,
+      subtitle: loading ? '…' : `${announcementCount ?? '-'} publicado${announcementCount !== 1 ? 's' : ''}`,
     },
   ]
 

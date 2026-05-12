@@ -102,13 +102,13 @@ export default function App() {
 
         <Route path="/staff/assigned" element={<Guarded><StaffAssignedPage /></Guarded>} />
 
-        {/* Resident pages */}
+        {/* Páginas para residentes */}
         <Route path="/complaints" element={<Guarded><ResidentComplaintsPage /></Guarded>} />
         <Route path="/payments" element={<Guarded><ResidentPaymentsPage /></Guarded>} />
         <Route path="/announcements" element={<Guarded><AnnouncementsPage /></Guarded>} />
         <Route path="/settings" element={<Guarded><UserSettingsPage /></Guarded>} />
 
-        {/* Admin dashboard (nested routes with sidebar layout) */}
+        {/* Páginas para administración (rutas anidadadas con diseño de sidebar) */}
         <Route
           path="/admin-dashboard"
           element={<Guarded><AdminDashboardLayout /></Guarded>}
