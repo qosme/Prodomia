@@ -65,7 +65,7 @@ export default function ManagerApprovalsPage() {
                 </div>
               </div>
               <div className="muted" style={{ fontSize: 13 }}>
-                Unit: {u.resident_profile?.unit || '—'} • Phone: {u.resident_profile?.phone || '—'}
+                Unit: {u.resident_profile?.unit || '-'} • Phone: {u.resident_profile?.phone || '-'}
               </div>
             </div>
           ))}

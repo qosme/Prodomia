@@ -81,7 +81,7 @@ export default function ManagerAssignPage() {
                 <option value="">Select…</option>
                 {complaints.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.title} ({c.status}) — {c.resident_username}
+                    {c.title} ({c.status}) - {c.resident_username}
                   </option>
                 ))}
               </select>
@@ -118,7 +118,7 @@ export default function ManagerAssignPage() {
                   <span className="pill">{c.status}</span>
                 </div>
                 <div className="muted" style={{ fontSize: 13 }}>
-                  Assigned to: {c.assignment?.assigned_to_username || '—'}
+                  Assigned to: {c.assignment?.assigned_to_username || '-'}
                 </div>
               </Link>
             ))}

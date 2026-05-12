@@ -134,8 +134,8 @@ export default function AdminComplaintsPage() {
                     <Link to={`/complaints/${c.id}`} style={{ color: 'var(--brand)' }}>{c.title}</Link>
                   </td>
                   <td>{c.resident_username}</td>
-                  <td>{c.category || '—'}</td>
-                  <td>{c.location || '—'}</td>
+                  <td>{c.category || '-'}</td>
+                  <td>{c.location || '-'}</td>
                   <td>
                     <select style={inlineSelect} value={c.status} onChange={(e) => setStatus(c.id, e.target.value)}>
                       {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
@@ -147,11 +147,11 @@ export default function AdminComplaintsPage() {
                       value={c.assignment?.assigned_to || ''}
                       onChange={(e) => assign(c.id, e.target.value)}
                     >
-                      <option value="">— Sin asignar —</option>
+                      <option value="">- Sin asignar -</option>
                       {staffUsers.map((u) => <option key={u.id} value={u.id}>{u.username}</option>)}
                     </select>
                   </td>
-                  <td>{new Date(c.created_at).toLocaleDateString()}</td>
+                  <td>{new Date(c.created_at).toLocaleDateString('es-CL')}</td>
                 </tr>
               ))}
             </tbody>

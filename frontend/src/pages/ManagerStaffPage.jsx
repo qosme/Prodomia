@@ -100,7 +100,7 @@ export default function ManagerStaffPage() {
                   <div style={{ fontWeight: 650 }}>{u.username}</div>
                   <span className="pill ok">staff</span>
                 </div>
-                <div className="muted" style={{ fontSize: 13 }}>{u.email || '—'}</div>
+                <div className="muted" style={{ fontSize: 13 }}>{u.email || '-'}</div>
               </div>
             ))}
             {staff.length === 0 && <div className="muted">No staff users yet.</div>}

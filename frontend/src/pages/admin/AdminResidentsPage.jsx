@@ -77,9 +77,9 @@ export default function AdminResidentsPage() {
               {users.map((u) => (
                 <tr key={u.id}>
                   <td>{u.username}</td>
-                  <td>{u.email || '—'}</td>
-                  <td>{u.resident_profile?.unit || '—'}</td>
-                  <td>{u.resident_profile?.phone || '—'}</td>
+                  <td>{u.email || '-'}</td>
+                  <td>{u.resident_profile?.unit || '-'}</td>
+                  <td>{u.resident_profile?.phone || '-'}</td>
                   <td>
                     <span className={`pill ${u.resident_profile?.is_approved ? 'ok' : 'bad'}`}>
                       {u.resident_profile?.is_approved ? 'Aprobado' : 'Pendiente'}

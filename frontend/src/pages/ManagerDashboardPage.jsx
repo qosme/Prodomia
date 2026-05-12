@@ -153,7 +153,7 @@ export default function ManagerDashboardPage() {
                     ))}
                   </select>
                   <span className="muted" style={{ fontSize: 13 }}>
-                    Actual: {c.assignment?.assigned_to_username || '—'}
+                    Actual: {c.assignment?.assigned_to_username || '-'}
                   </span>
                 </div>
 

@@ -46,6 +46,9 @@ export default function ComplaintDetailPage() {
     }
   }
 
+  // Vuelve a obtener los datos del reclamo cada vez que cambia el id.
+  // load se omite de las dependencias intencionalmente 
+  // se recrea en cada render pero solo el id debe ejecutar un refetch.
   useEffect(() => {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -158,7 +161,7 @@ export default function ComplaintDetailPage() {
                   <div className="row" style={{ justifyContent: 'space-between' }}>
                     <span className="pill">{c.author_username}</span>
                     <span className="muted" style={{ fontSize: 12 }}>
-                      {new Date(c.created_at).toLocaleString()}
+                      {new Date(c.created_at).toLocaleString('es-CL')}
                     </span>
                   </div>
                   <div style={{ height: 6 }} />

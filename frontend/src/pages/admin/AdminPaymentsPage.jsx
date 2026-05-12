@@ -81,7 +81,7 @@ export default function AdminPaymentsPage() {
     }
   }
 
-  // Fees that have no PAID or MANUAL payment
+  // Cuotas que no tienen un pago registrado como PAID o MANUAL
   const paidFeeIds = new Set(
     payments
       .filter((p) => p.status === 'PAID' || p.status === 'MANUAL')
@@ -98,7 +98,7 @@ export default function AdminPaymentsPage() {
       {msg && <p className="success">{msg}</p>}
       {error && <p className="error">{error}</p>}
 
-      {/* Unpaid fees */}
+      {/* Cuotas sin pago registrado */}
       {!loading && unpaidFees.length > 0 && (
         <>
           <h3 style={{ marginBottom: 12 }}>Cuotas sin pago registrado</h3>
@@ -159,7 +159,7 @@ export default function AdminPaymentsPage() {
         </>
       )}
 
-      {/* All payment records */}
+      {/* Historial de pagos */}
       <div className="row" style={{ marginBottom: 16, justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ margin: 0 }}>Historial de pagos</h3>
         <div className="row" style={{ gap: 8 }}>
@@ -206,11 +206,11 @@ export default function AdminPaymentsPage() {
                 <>
                   <tr key={p.id}>
                     <td>{p.resident_username}</td>
-                    <td>{p.monthly_fee?.unit || '—'}</td>
+                    <td>{p.monthly_fee?.unit || '-'}</td>
                     <td>
                       {p.monthly_fee
                         ? `${MONTHS[p.monthly_fee.period_month - 1]} ${p.monthly_fee.period_year}`
-                        : '—'}
+                        : '-'}
                     </td>
                     <td>${Number(p.amount).toLocaleString('es-CL')}</td>
                     <td>
@@ -218,8 +218,8 @@ export default function AdminPaymentsPage() {
                     </td>
                     <td>
                       {p.transaction_date
-                        ? new Date(p.transaction_date).toLocaleDateString()
-                        : new Date(p.created_at).toLocaleDateString()}
+                        ? new Date(p.transaction_date).toLocaleDateString('es-CL')
+                        : new Date(p.created_at).toLocaleDateString('es-CL')}
                     </td>
                     <td>
                       {p.status === 'PENDING' && (

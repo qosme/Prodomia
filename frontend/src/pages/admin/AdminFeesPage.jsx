@@ -118,7 +118,7 @@ export default function AdminFeesPage() {
                 onChange={(e) => setForm({ ...form, unit: e.target.value })}
               >
                 <option value="">
-                  {unitsLoading ? 'Cargando unidades…' : '— Seleccionar unidad —'}
+                  {unitsLoading ? 'Cargando unidades…' : '- Seleccionar unidad -'}
                 </option>
                 {!unitsLoading && (
                   <option value={ALL_UNITS}>Todas las unidades ({units.length})</option>
@@ -166,6 +166,7 @@ export default function AdminFeesPage() {
               <input
                 type="date"
                 required
+                min="2020-01-01"
                 value={form.due_date}
                 onChange={(e) => setForm({ ...form, due_date: e.target.value })}
               />
