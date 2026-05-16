@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
 from rest_framework import serializers as drf_serializers
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -36,10 +37,27 @@ class _EmailTokenSerializer(BaseTokenObtainPairSerializer):
         return super().validate(attrs)
 
 
+@extend_schema(
+    tags=["Autenticación"],
+    summary="Iniciar sesión",
+    description="Obtiene un par de tokens JWT (`access` y `refresh`) usando **email** y contraseña.",
+)
 class TokenObtainPairView(BaseTokenObtainPairView):
     serializer_class = _EmailTokenSerializer
 
 
+@extend_schema_view(
+    post=extend_schema(
+        tags=["Autenticación"],
+        summary="Registrar nuevo usuario",
+        description=(
+            "Crea una cuenta de residente con email y contraseña. "
+            "La cuenta queda **pendiente de aprobación** por el administrador antes de poder operar en el sistema."
+        ),
+        request=RegisterSerializer,
+        responses={201: UserSerializer},
+    )
+)
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -50,6 +68,17 @@ class RegisterView(APIView):
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Autenticación"],
+        summary="Mi perfil",
+        description=(
+            "Retorna los datos del usuario autenticado junto con su **rol** "
+            "(`manager`, `staff` o `resident`) y su estado de aprobación."
+        ),
+        responses={200: UserSerializer},
+    )
+)
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -72,6 +101,24 @@ class MeView(APIView):
         return Response(data)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        tags=["Autenticación"],
+        summary="Cambiar contraseña",
+        description="Actualiza la contraseña del usuario autenticado. Se requiere `current_password` para confirmar la identidad.",
+        request=inline_serializer(
+            name="ChangePasswordRequest",
+            fields={
+                "current_password": drf_serializers.CharField(),
+                "new_password": drf_serializers.CharField(min_length=8),
+            },
+        ),
+        responses={200: inline_serializer(
+            name="ChangePasswordResponse",
+            fields={"detail": drf_serializers.CharField()},
+        )},
+    )
+)
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 

@@ -1,4 +1,5 @@
 from django.db import transaction
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -22,6 +23,33 @@ from ..serializers import (
 )
 
 
+@extend_schema(tags=["Reclamos"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar reclamos",
+        description="El **administrador** ve todos los reclamos; el **staff** ve los asignados a él; el **residente** ve solo los suyos.",
+    ),
+    retrieve=extend_schema(
+        summary="Obtener reclamo",
+        description="Retorna los detalles completos de un reclamo, incluyendo fotos, comentarios e historial de estados.",
+    ),
+    create=extend_schema(
+        summary="Crear reclamo",
+        description="Crea un nuevo reclamo. Solo disponible para **residentes aprobados**.",
+    ),
+    update=extend_schema(
+        summary="Actualizar reclamo",
+        description="Reemplaza todos los campos editables de un reclamo.",
+    ),
+    partial_update=extend_schema(
+        summary="Actualizar reclamo parcialmente",
+        description="Actualiza uno o más campos de un reclamo sin reemplazar los demás.",
+    ),
+    destroy=extend_schema(
+        summary="Eliminar reclamo",
+        description="Elimina un reclamo del sistema de forma permanente.",
+    ),
+)
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaint.objects.all().select_related("resident").order_by("-created_at")
     serializer_class = ComplaintSerializer
@@ -62,6 +90,11 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    @extend_schema(
+        tags=["Reclamos"],
+        summary="Agregar comentario",
+        description="Agrega un comentario al hilo de un reclamo. Disponible para cualquier usuario con acceso al reclamo.",
+    )
     @action(detail=True, methods=["post"])
     def add_comment(self, request, pk=None):
         complaint = self.get_object()
@@ -75,6 +108,11 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         complaint.refresh_from_db()
         return Response(ComplaintSerializer(complaint, context={"request": request}).data)
 
+    @extend_schema(
+        tags=["Reclamos"],
+        summary="Subir foto",
+        description="Adjunta una imagen (`multipart/form-data`, campo `image`) a un reclamo existente.",
+    )
     @action(detail=True, methods=["post"])
     def upload_photo(self, request, pk=None):
         complaint = self.get_object()
@@ -89,10 +127,15 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         complaint.refresh_from_db()
         return Response(ComplaintSerializer(complaint, context={"request": request}).data)
 
+    @extend_schema(
+        tags=["Reclamos"],
+        summary="Asignar reclamo",
+        description="Asigna el reclamo a un miembro del **staff**. Si el estado es `NEW`, lo cambia a `ASSIGNED` automáticamente. Solo el **administrador** puede asignar.",
+    )
     @action(detail=True, methods=["post"])
     def assign(self, request, pk=None):
         if not is_manager(request.user):
-            return Response({"detail": "Solo el gestor puede asignar reclamos."}, status=403)
+            return Response({"detail": "Solo el administrador puede asignar reclamos."}, status=403)
         complaint = self.get_object()
         ser = AssignComplaintSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
@@ -116,6 +159,15 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         complaint.refresh_from_db()
         return Response(ComplaintSerializer(complaint, context={"request": request}).data)
 
+    @extend_schema(
+        tags=["Reclamos"],
+        summary="Cambiar estado del reclamo",
+        description=(
+            "Cambia el estado de un reclamo. El **administrador** puede cambiar cualquier estado; "
+            "el **staff** solo puede cambiar el estado de los reclamos asignados a él.\n\n"
+            "Flujo típico: `NEW` → `ASSIGNED` → `IN_PROGRESS` → `RESOLVED` → `CLOSED`."
+        ),
+    )
     @action(detail=True, methods=["post"])
     def set_status(self, request, pk=None):
         complaint = self.get_object()

@@ -20,6 +20,8 @@ Los residentes pueden registrarse, ser aprobados por un administrador, enviar re
 
 URL base de la API: `http://localhost:8000/api`
 
+Documentación API REST (Swagger): `http://localhost:8000/api/schema/swagger/`
+
 ### Base de datos (Postgres)
 
 En `backend/.env`, configurar `DATABASE_URL` según la opción elegida:

@@ -113,7 +113,7 @@ export default function DashboardPage() {
                     <div className="row" style={{ justifyContent: 'space-between' }}>
                       <div style={{ fontWeight: 650 }}>{u.text}</div>
                       <span className="muted" style={{ fontSize: 12 }}>
-                        {new Date(u.at).toLocaleString('es-CL')}
+                        {new Date(u.at).toLocaleString('es-CL', { hour12: false })}
                       </span>
                     </div>
                     <div className="muted" style={{ fontSize: 13 }}>

@@ -198,7 +198,7 @@ export default function ResidentHomePage() {
                     <span style={{ fontWeight: 500 }}>{n.text}</span>
                   </div>
                   <span className="muted" style={{ fontSize: 12, whiteSpace: 'nowrap', marginLeft: 12 }}>
-                    {new Date(n.at).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}
+                    {new Date(n.at).toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
                   </span>
                 </div>
               </Link>

@@ -20,7 +20,7 @@ class ComplaintPhotoSerializer(serializers.ModelSerializer):
         fields = ["id", "image_url", "uploaded_by", "created_at"]
         read_only_fields = ["id", "uploaded_by", "created_at"]
 
-    def get_image_url(self, obj: ComplaintPhoto):
+    def get_image_url(self, obj: ComplaintPhoto) -> str:
         request = self.context.get("request")
         if request is None:
             return obj.image.url

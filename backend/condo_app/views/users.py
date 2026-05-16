@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -11,6 +12,17 @@ from ..serializers import CreateStaffSerializer, UserSerializer
 User = get_user_model()
 
 
+@extend_schema(tags=["Usuarios"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar usuarios",
+        description="Retorna todos los usuarios del sistema (residentes, staff y administrador). Solo accesible por el **administrador**.",
+    ),
+    retrieve=extend_schema(
+        summary="Obtener usuario",
+        description="Retorna los datos de un usuario específico. Solo accesible por el **administrador**.",
+    ),
+)
 class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated, IsManager]
     serializer_class = UserSerializer
@@ -18,6 +30,11 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
     def get_queryset(self):
         return User.objects.all().order_by("id")
 
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Residentes pendientes de aprobación",
+        description="Lista los residentes cuya cuenta fue registrada pero aún no ha sido aprobada por el administrador.",
+    )
     @action(detail=False, methods=["get"])
     def pending_residents(self, request):
         users = (
@@ -27,6 +44,11 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
         )
         return Response(UserSerializer(users, many=True).data)
 
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Aprobar residente",
+        description="Aprueba la cuenta de un residente para que pueda acceder a las funciones del sistema (reclamos, pagos, etc.).",
+    )
     @action(detail=True, methods=["post"])
     def approve_resident(self, request, pk=None):
         user = self.get_object()
@@ -35,12 +57,22 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
         profile.save(update_fields=["is_approved"])
         return Response(UserSerializer(user).data)
 
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Promover a staff",
+        description="Asigna el rol de **staff** (personal de mantención) a un usuario existente.",
+    )
     @action(detail=True, methods=["post"])
     def make_staff(self, request, pk=None):
         user = self.get_object()
         StaffProfile.objects.get_or_create(user=user)
         return Response(UserSerializer(user).data)
 
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Listar staff",
+        description="Retorna todos los usuarios con perfil de **staff** activo.",
+    )
     @action(detail=False, methods=["get"])
     def staff(self, request):
         users = (
@@ -50,6 +82,11 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
         )
         return Response(UserSerializer(users, many=True).data)
 
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Crear usuario staff",
+        description="Crea un nuevo usuario con rol de **staff** directamente, sin pasar por el flujo de registro de residentes.",
+    )
     @action(detail=False, methods=["post"])
     def create_staff(self, request):
         serializer = CreateStaffSerializer(data=request.data)
@@ -57,6 +94,11 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
         user = serializer.save()
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Desactivar usuario",
+        description="Desactiva la cuenta de un usuario (`is_active = false`). El usuario no podrá iniciar sesión.",
+    )
     @action(detail=True, methods=["post"])
     def deactivate(self, request, pk=None):
         user = self.get_object()
@@ -64,6 +106,11 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
         user.save(update_fields=["is_active"])
         return Response(UserSerializer(user).data)
 
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Desactivar staff",
+        description="Desactiva el perfil de staff de un usuario (`is_active_staff = false`) sin eliminar su cuenta.",
+    )
     @action(detail=True, methods=["post"])
     def deactivate_staff(self, request, pk=None):
         user = self.get_object()

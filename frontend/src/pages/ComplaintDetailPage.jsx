@@ -162,7 +162,7 @@ export default function ComplaintDetailPage() {
                   <div className="row" style={{ justifyContent: 'space-between' }}>
                     <span className="pill">{c.author_username}</span>
                     <span className="muted" style={{ fontSize: 12 }}>
-                      {new Date(c.created_at).toLocaleString('es-CL')}
+                      {new Date(c.created_at).toLocaleString('es-CL', { hour12: false })}
                     </span>
                   </div>
                   <div style={{ height: 6 }} />
@@ -230,7 +230,7 @@ export default function ComplaintDetailPage() {
                           <span className="pill ok">{STATUS_LABELS[h.to_status] ?? h.to_status}</span>
                         </div>
                         <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-                          {new Date(h.created_at).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}
+                          {new Date(h.created_at).toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
                           {h.changed_by_username ? ` · ${h.changed_by_username}` : ''}
                         </div>
                       </div>
@@ -242,7 +242,7 @@ export default function ComplaintDetailPage() {
             <div style={{ height: 14 }} />
             {canManage && (
               <>
-                <h2>Acciones del gestor</h2>
+                <h2>Acciones del administrador</h2>
                 <div className="muted">
                   Usa la pantalla de asignación para asignar este reclamo al personal.
                 </div>

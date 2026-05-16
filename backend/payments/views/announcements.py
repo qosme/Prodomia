@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,6 +9,33 @@ from ..models import Announcement
 from ..serializers import AnnouncementSerializer
 
 
+@extend_schema(tags=["Anuncios"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar anuncios",
+        description="El **administrador** ve todos los anuncios (activos e inactivos); los **residentes y staff** ven solo los activos.",
+    ),
+    retrieve=extend_schema(
+        summary="Obtener anuncio",
+        description="Retorna los detalles de un anuncio específico.",
+    ),
+    create=extend_schema(
+        summary="Crear anuncio",
+        description="Crea un nuevo anuncio visible para los residentes del condominio. Solo el **administrador**.",
+    ),
+    update=extend_schema(
+        summary="Actualizar anuncio",
+        description="Reemplaza todos los campos de un anuncio. Solo el **administrador**.",
+    ),
+    partial_update=extend_schema(
+        summary="Actualizar anuncio parcialmente",
+        description="Actualiza uno o más campos de un anuncio. Solo el **administrador**.",
+    ),
+    destroy=extend_schema(
+        summary="Archivar anuncio",
+        description="Desactiva (archiva) un anuncio sin eliminarlo de la base de datos (`is_active = false`). Solo el **administrador**.",
+    ),
+)
 class AnnouncementViewSet(viewsets.ModelViewSet):
     serializer_class = AnnouncementSerializer
     permission_classes = [IsAuthenticated]

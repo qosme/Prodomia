@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # Third-party
     "corsheaders",
     "rest_framework",
+    "drf_spectacular",
 
     # Local
     "condo_app",
@@ -184,4 +185,47 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Prodomia API",
+    "DESCRIPTION": (
+        "API REST para la gestión de condominios.\n\n"
+        "### Autenticación\n"
+        "Todos los endpoints (excepto registro e inicio de sesión) requieren un **Bearer token** JWT.\n"
+        "Obtén tu token en `POST /api/auth/token/` e inclúyelo en el header:\n"
+        "```\nAuthorization: Bearer <access_token>\n```\n\n"
+        "### Roles\n"
+        "| Rol | Descripción |\n"
+        "|-----|-------------|\n"
+        "| `manager` | Administrador del condominio (acceso total). |\n"
+        "| `staff` | Personal de mantención (ve reclamos asignados). |\n"
+        "| `resident` | Residente (debe estar aprobado para operar). |"
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SECURITY": [{"jwtAuth": []}],
+    "COMPONENTS": {
+        "securitySchemes": {
+            "jwtAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+            }
+        }
+    },
+    "ENUM_NAME_OVERRIDES": {
+        "ComplaintStatusEnum": ["NEW", "ASSIGNED", "IN_PROGRESS", "RESOLVED", "REJECTED", "CLOSED"],
+        "PaymentStatusEnum": ["PENDING", "PAID", "FAILED", "MANUAL"],
+    },
+    "TAGS": [
+        {"name": "Autenticación", "description": "Registro, inicio de sesión y gestión de tokens JWT."},
+        {"name": "Usuarios", "description": "Administración de usuarios del condominio (solo administrador)."},
+        {"name": "Reclamos", "description": "Gestión de reclamos y solicitudes del condominio."},
+        {"name": "Cuotas", "description": "Cuotas mensuales por unidad residencial."},
+        {"name": "Pagos", "description": "Pagos online vía WebPay Plus y registros manuales."},
+        {"name": "Anuncios", "description": "Anuncios y comunicados del condominio."},
+        {"name": "Dashboard", "description": "Estadísticas generales para el administrador."},
+    ],
 }

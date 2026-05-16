@@ -1,5 +1,7 @@
 from django.db.models import Sum
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
+from rest_framework import serializers as drf_serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,6 +12,34 @@ from condo_app.permissions import IsManager
 from ..models import MonthlyFee, Payment
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Dashboard"],
+        summary="Estadísticas generales",
+        description=(
+            "Retorna un resumen de métricas del condominio para el **mes en curso**. Solo el **administrador**.\n\n"
+            "| Campo | Descripción |\n"
+            "|-------|-------------|\n"
+            "| `total_units` | Unidades con al menos un residente aprobado |\n"
+            "| `pending_approvals` | Residentes pendientes de aprobación |\n"
+            "| `open_complaints` | Reclamos que no están resueltos, cerrados ni rechazados |\n"
+            "| `total_fees_this_month` | Cuotas generadas en el mes actual |\n"
+            "| `paid_this_month` | Cuotas pagadas en el mes actual |\n"
+            "| `revenue_this_month` | Monto total recaudado en el mes actual |"
+        ),
+        responses={200: inline_serializer(
+            name="DashboardStatsResponse",
+            fields={
+                "total_units": drf_serializers.IntegerField(),
+                "pending_approvals": drf_serializers.IntegerField(),
+                "open_complaints": drf_serializers.IntegerField(),
+                "total_fees_this_month": drf_serializers.IntegerField(),
+                "paid_this_month": drf_serializers.IntegerField(),
+                "revenue_this_month": drf_serializers.FloatField(),
+            },
+        )},
+    )
+)
 class DashboardStatsView(APIView):
     permission_classes = [IsAuthenticated, IsManager]
 

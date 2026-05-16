@@ -82,7 +82,7 @@ export default function ManagerDashboardPage() {
   if (user?.role !== 'manager') {
     return (
       <div className="container">
-        <div className="card">Solo gestores.</div>
+        <div className="card">Solo administradores.</div>
       </div>
     )
   }
@@ -92,7 +92,7 @@ export default function ManagerDashboardPage() {
       <div className="card">
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <div>
-            <h2 style={{ margin: 0 }}>Panel del gestor</h2>
+            <h2 style={{ margin: 0 }}>Panel del administrador</h2>
             <div className="muted" style={{ marginTop: 6 }}>
               Ver todos los reclamos, filtrar por categoría, actualizar estado y asignar personal.
             </div>
