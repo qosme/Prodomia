@@ -99,7 +99,7 @@ export default function AdminAnnouncementsPage() {
               <p style={{ margin: '4px 0', whiteSpace: 'pre-wrap' }}>{a.body}</p>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <span className="muted" style={{ fontSize: 12 }}>
-                  Por {a.created_by_username} · {new Date(a.created_at).toLocaleDateString()}
+                  Por {a.created_by_username} · {new Date(a.created_at).toLocaleDateString('es-CL')}
                 </span>
                 {a.is_active && (
                   <button

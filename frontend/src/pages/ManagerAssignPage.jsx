@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 
 export default function ManagerAssignPage() {
   const { user } = useAuth()
   const [complaints, setComplaints] = useState([])
   const [users, setUsers] = useState([])
   const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
   const [selectedComplaint, setSelectedComplaint] = useState('')
   const [selectedStaff, setSelectedStaff] = useState('')
 
@@ -19,15 +18,12 @@ export default function ManagerAssignPage() {
 
   async function load() {
     setError('')
-    setBusy(true)
     try {
       const [c, u] = await Promise.all([apiFetch('/complaints/'), apiFetch('/users/')])
       setComplaints(c)
       setUsers(u)
     } catch (err) {
       setError(err.message || 'Failed to load data')
-    } finally {
-      setBusy(false)
     }
   }
 
@@ -46,7 +42,9 @@ export default function ManagerAssignPage() {
   }
 
   useEffect(() => {
-    load()
+    Promise.all([apiFetch('/complaints/'), apiFetch('/users/')])
+      .then(([c, u]) => { setComplaints(c); setUsers(u) })
+      .catch(err => setError(err.message || 'Failed to load data'))
   }, [])
 
   if (user?.role !== 'manager') {
@@ -68,9 +66,6 @@ export default function ManagerAssignPage() {
                 Select a complaint and assign it to a maintenance staff user.
               </div>
             </div>
-            <button className="btn" onClick={load} disabled={busy}>
-              Refresh
-            </button>
           </div>
 
           <div style={{ height: 12 }} />
@@ -86,7 +81,7 @@ export default function ManagerAssignPage() {
                 <option value="">Select…</option>
                 {complaints.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.title} ({c.status}) — {c.resident_username}
+                    {c.title} ({c.status}) - {c.resident_username}
                   </option>
                 ))}
               </select>
@@ -123,7 +118,7 @@ export default function ManagerAssignPage() {
                   <span className="pill">{c.status}</span>
                 </div>
                 <div className="muted" style={{ fontSize: 13 }}>
-                  Assigned to: {c.assignment?.assigned_to_username || '—'}
+                  Assigned to: {c.assignment?.assigned_to_username || '-'}
                 </div>
               </Link>
             ))}

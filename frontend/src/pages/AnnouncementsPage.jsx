@@ -32,7 +32,7 @@ export default function AnnouncementsPage() {
               <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
                 <h3 style={{ margin: 0 }}>{a.title}</h3>
                 <span className="muted" style={{ fontSize: 12 }}>
-                  {new Date(a.created_at).toLocaleDateString()}
+                  {new Date(a.created_at).toLocaleDateString('es-CL')}
                 </span>
               </div>
               <p style={{ margin: '0 0 8px', whiteSpace: 'pre-wrap' }}>{a.body}</p>

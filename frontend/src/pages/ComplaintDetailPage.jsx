@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
+import { useParams } from 'react-router-dom'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 
 const STATUS_LABELS = {
   NEW: 'Nuevo',
@@ -46,6 +47,9 @@ export default function ComplaintDetailPage() {
     }
   }
 
+  // Vuelve a obtener los datos del reclamo cada vez que cambia el id.
+  // load se omite de las dependencias intencionalmente 
+  // se recrea en cada render pero solo el id debe ejecutar un refetch.
   useEffect(() => {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,14 +104,6 @@ export default function ComplaintDetailPage() {
 
   return (
     <div className="container">
-      <div className="row" style={{ justifyContent: 'space-between' }}>
-        <Link className="muted" to="/">
-          ← Volver
-        </Link>
-        <button className="btn" onClick={load} disabled={busy}>
-          Refrescar
-        </button>
-      </div>
 
       <div style={{ height: 12 }} />
 
@@ -166,7 +162,7 @@ export default function ComplaintDetailPage() {
                   <div className="row" style={{ justifyContent: 'space-between' }}>
                     <span className="pill">{c.author_username}</span>
                     <span className="muted" style={{ fontSize: 12 }}>
-                      {new Date(c.created_at).toLocaleString()}
+                      {new Date(c.created_at).toLocaleString('es-CL', { hour12: false })}
                     </span>
                   </div>
                   <div style={{ height: 6 }} />
@@ -199,30 +195,54 @@ export default function ComplaintDetailPage() {
               <div className="muted">Sin asignar.</div>
             )}
 
-            <div style={{ height: 14 }} />
-            <h2>Estado</h2>
-            {(canManage || canStaffUpdate) ? (
-              <form onSubmit={setComplaintStatus}>
-                <div className="field">
-                  <label>Cambiar estado</label>
-                  <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                    {STATUSES.map((s) => (
-                      <option key={s} value={s}>
-                        {STATUS_LABELS[s] ?? s}
-                      </option>
+            {(canManage || canStaffUpdate) && (
+              <>
+                <div style={{ height: 14 }} />
+                <h2>Estado</h2>
+                <form onSubmit={setComplaintStatus}>
+                  <div className="field">
+                    <label>Cambiar estado</label>
+                    <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                      {STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {STATUS_LABELS[s] ?? s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button className="btn">Actualizar estado</button>
+                </form>
+              </>
+            )}
+
+            {data.status_history?.length > 0 && (
+              <>
+                <div style={{ height: 14 }} />
+                <h2 style={{ margin: '0 0 10px' }}>Historial</h2>
+                <div className="list">
+                  {[...data.status_history]
+                    .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+                    .map((h) => (
+                      <div key={h.id} className="item" style={{ cursor: 'default' }}>
+                        <div className="row" style={{ gap: 6 }}>
+                          <span className="pill">{STATUS_LABELS[h.from_status] ?? h.from_status}</span>
+                          <ArrowRight size={14} className="muted" />
+                          <span className="pill ok">{STATUS_LABELS[h.to_status] ?? h.to_status}</span>
+                        </div>
+                        <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+                          {new Date(h.created_at).toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
+                          {h.changed_by_username ? ` · ${h.changed_by_username}` : ''}
+                        </div>
+                      </div>
                     ))}
-                  </select>
                 </div>
-                <button className="btn">Actualizar estado</button>
-              </form>
-            ) : (
-              <div className="muted">Solo el gestor o personal asignado puede actualizar el estado.</div>
+              </>
             )}
 
             <div style={{ height: 14 }} />
             {canManage && (
               <>
-                <h2>Acciones del gestor</h2>
+                <h2>Acciones del administrador</h2>
                 <div className="muted">
                   Usa la pantalla de asignación para asignar este reclamo al personal.
                 </div>

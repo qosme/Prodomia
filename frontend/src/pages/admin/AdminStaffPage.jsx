@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../../api.js'
+import PasswordInput from '../../components/PasswordInput.jsx'
 
 export default function AdminStaffPage() {
   const [staffList, setStaffList] = useState([])
@@ -77,12 +78,12 @@ export default function AdminStaffPage() {
             </div>
             <div className="field">
               <label>Contraseña</label>
-              <input
-                type="password"
+              <PasswordInput
                 required
                 minLength={8}
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
+                autoComplete="new-password"
               />
             </div>
             <button className="btn primary" type="submit" disabled={creating}>
@@ -117,7 +118,7 @@ export default function AdminStaffPage() {
               {staffList.map((u) => (
                 <tr key={u.id}>
                   <td>{u.username}</td>
-                  <td>{u.email || '—'}</td>
+                  <td>{u.email || '-'}</td>
                   <td>
                     <span className={`pill ${u.staff_profile?.is_active_staff ? 'ok' : 'bad'}`}>
                       {u.staff_profile?.is_active_staff ? 'Activo' : 'Inactivo'}

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 
 const STATUSES = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'CLOSED']
 
@@ -26,8 +26,6 @@ export default function ManagerDashboardPage() {
   const [users, setUsers] = useState([])
   const [category, setCategory] = useState('')
   const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
-
   const staffUsers = useMemo(() => users.filter((u) => u.staff_profile), [users])
   const categories = useMemo(() => {
     const set = new Set()
@@ -42,15 +40,12 @@ export default function ManagerDashboardPage() {
 
   async function load() {
     setError('')
-    setBusy(true)
     try {
       const [c, u] = await Promise.all([apiFetch('/complaints/'), apiFetch('/users/')])
       setComplaints(c)
       setUsers(u)
     } catch (err) {
       setError(err.message || 'Failed to load manager dashboard')
-    } finally {
-      setBusy(false)
     }
   }
 
@@ -79,13 +74,15 @@ export default function ManagerDashboardPage() {
   }
 
   useEffect(() => {
-    load()
+    Promise.all([apiFetch('/complaints/'), apiFetch('/users/')])
+      .then(([c, u]) => { setComplaints(c); setUsers(u) })
+      .catch(err => setError(err.message || 'Failed to load manager dashboard'))
   }, [])
 
   if (user?.role !== 'manager') {
     return (
       <div className="container">
-        <div className="card">Solo gestores.</div>
+        <div className="card">Solo administradores.</div>
       </div>
     )
   }
@@ -95,14 +92,11 @@ export default function ManagerDashboardPage() {
       <div className="card">
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <div>
-            <h2 style={{ margin: 0 }}>Panel del gestor</h2>
+            <h2 style={{ margin: 0 }}>Panel del administrador</h2>
             <div className="muted" style={{ marginTop: 6 }}>
               Ver todos los reclamos, filtrar por categoría, actualizar estado y asignar personal.
             </div>
           </div>
-          <button className="btn" onClick={load} disabled={busy}>
-            Refrescar
-          </button>
         </div>
 
         <div style={{ height: 12 }} />
@@ -159,7 +153,7 @@ export default function ManagerDashboardPage() {
                     ))}
                   </select>
                   <span className="muted" style={{ fontSize: 13 }}>
-                    Actual: {c.assignment?.assigned_to_username || '—'}
+                    Actual: {c.assignment?.assigned_to_username || '-'}
                   </span>
                 </div>
 

@@ -1,23 +1,18 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 
 export default function ManagerApprovalsPage() {
   const { user } = useAuth()
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
-
   async function load() {
     setError('')
-    setBusy(true)
     try {
       const data = await apiFetch('/users/pending_residents/')
       setItems(data)
     } catch (err) {
       setError(err.message || 'Failed to load pending residents')
-    } finally {
-      setBusy(false)
     }
   }
 
@@ -31,7 +26,9 @@ export default function ManagerApprovalsPage() {
   }
 
   useEffect(() => {
-    load()
+    apiFetch('/users/pending_residents/')
+      .then(data => setItems(data))
+      .catch(err => setError(err.message || 'Failed to load pending residents'))
   }, [])
 
   if (user?.role !== 'manager') {
@@ -52,9 +49,6 @@ export default function ManagerApprovalsPage() {
               Approve residents so they can submit complaints.
             </div>
           </div>
-          <button className="btn" onClick={load} disabled={busy}>
-            Refresh
-          </button>
         </div>
         <div style={{ height: 12 }} />
         {error && <div className="error">{error}</div>}
@@ -71,7 +65,7 @@ export default function ManagerApprovalsPage() {
                 </div>
               </div>
               <div className="muted" style={{ fontSize: 13 }}>
-                Unit: {u.resident_profile?.unit || '—'} • Phone: {u.resident_profile?.phone || '—'}
+                Unit: {u.resident_profile?.unit || '-'} • Phone: {u.resident_profile?.phone || '-'}
               </div>
             </div>
           ))}

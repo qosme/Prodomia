@@ -1,5 +1,5 @@
-import { NavLink, Navigate, Outlet, Link } from 'react-router-dom'
-import { useAuth } from '../../auth.jsx'
+import { NavLink, Navigate, Outlet } from 'react-router-dom'
+import { useAuth } from '../../useAuth.js'
 
 export default function AdminDashboardLayout() {
   const { user } = useAuth()
@@ -54,9 +54,6 @@ export default function AdminDashboardLayout() {
           >
             Reclamos
           </NavLink>
-          <Link to="/manager" className="admin-nav-link">
-            Gestión de Reclamos
-          </Link>
         </nav>
       </aside>
       <main className="admin-main">

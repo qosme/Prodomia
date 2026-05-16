@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
+import ResidentHomePage from './ResidentHomePage.jsx'
+import ManagerHomePage from './ManagerHomePage.jsx'
 
 const STATUS_LABELS = {
   NEW: 'Nuevo',
@@ -25,7 +28,7 @@ function computeUpdates(complaints) {
     const lastStatus = (c.status_history || []).slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0]
     const candidates = []
     if (lastComment) candidates.push({ type: 'comment', at: lastComment.created_at, who: lastComment.author_username, text: `Comentó en “${c.title}”` , complaintId: c.id })
-    if (lastStatus) candidates.push({ type: 'status', at: lastStatus.created_at, who: lastStatus.changed_by_username, text: `Estado ${STATUS_LABELS[lastStatus.from_status] ?? lastStatus.from_status} → ${STATUS_LABELS[lastStatus.to_status] ?? lastStatus.to_status} en “${c.title}”`, complaintId: c.id })
+    if (lastStatus) candidates.push({ type: 'status', at: lastStatus.created_at, who: lastStatus.changed_by_username, text: `Estado ${STATUS_LABELS[lastStatus.from_status] ?? lastStatus.from_status} -> ${STATUS_LABELS[lastStatus.to_status] ?? lastStatus.to_status} en “${c.title}”`, complaintId: c.id })
     for (const u of candidates) updates.push(u)
   }
   return updates.sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, 8)
@@ -35,9 +38,7 @@ export default function DashboardPage() {
   const { user, refreshMe } = useAuth()
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
 
-  const canCreate = useMemo(() => user?.role === 'resident' && user?.approved, [user])
   const statusCounts = useMemo(() => {
     const m = new Map()
     for (const c of items) m.set(c.status, (m.get(c.status) || 0) + 1)
@@ -47,22 +48,25 @@ export default function DashboardPage() {
 
   async function load() {
     setError('')
-    setBusy(true)
     try {
       const data = await apiFetch('/complaints/')
       setItems(data)
     } catch (err) {
       setError(err.message || 'Failed to load complaints')
-    } finally {
-      setBusy(false)
     }
   }
 
+  // Se ejecuta una vez al montar el componente para obtener el usuario y los reclamos.
+  // load y refreshMe se omiten de las dependencias intencionalmente
+  // ya que agregarlos haría que el effecto se volviera a ejecutar en cada render, ya que se recrean cada vez.
   useEffect(() => {
     refreshMe()
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  if (user?.role === 'resident') return <ResidentHomePage />
+  if (user?.role === 'manager') return <ManagerHomePage />
 
   return (
     <div className="container">
@@ -79,9 +83,6 @@ export default function DashboardPage() {
                     : 'Tus reclamos'}
               </div>
             </div>
-            <button className="btn" onClick={load} disabled={busy}>
-              Refrescar
-            </button>
           </div>
 
           <div style={{ height: 12 }} />
@@ -112,11 +113,11 @@ export default function DashboardPage() {
                     <div className="row" style={{ justifyContent: 'space-between' }}>
                       <div style={{ fontWeight: 650 }}>{u.text}</div>
                       <span className="muted" style={{ fontSize: 12 }}>
-                        {new Date(u.at).toLocaleString()}
+                        {new Date(u.at).toLocaleString('es-CL', { hour12: false })}
                       </span>
                     </div>
                     <div className="muted" style={{ fontSize: 13 }}>
-                      Por {u.who || '—'}
+                      Por {u.who || '-'}
                     </div>
                   </Link>
                 ))}
@@ -163,7 +164,7 @@ export default function DashboardPage() {
           <div style={{ height: 14 }} />
           <h2>Cuenta</h2>
           <div className="row">
-            <span className="pill">{user?.role === 'resident' ? 'residente' : user?.role || '—'}</span>
+            <span className="pill">{user?.role === 'resident' ? 'residente' : user?.role || '-'}</span>
             {user?.role === 'resident' && (
               <span className={`pill ${user?.approved ? 'ok' : 'bad'}`}>
                 {user?.approved ? 'aprobado' : 'pendiente'}

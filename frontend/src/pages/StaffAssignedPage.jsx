@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
 
 const STATUS_LABELS = {
   NEW: 'Nuevo',
@@ -16,23 +16,10 @@ export default function StaffAssignedPage() {
   const { user } = useAuth()
   const [items, setItems] = useState([])
   const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
-
-  async function load() {
-    setError('')
-    setBusy(true)
-    try {
-      const data = await apiFetch('/complaints/')
-      setItems(data)
-    } catch (err) {
-      setError(err.message || 'Error al cargar los reclamos asignados')
-    } finally {
-      setBusy(false)
-    }
-  }
-
   useEffect(() => {
-    load()
+    apiFetch('/complaints/')
+      .then(data => setItems(data))
+      .catch(err => setError(err.message || 'Error al cargar los reclamos asignados'))
   }, [])
 
   if (user?.role !== 'staff') {
@@ -53,9 +40,6 @@ export default function StaffAssignedPage() {
               Actualiza el estado desde cada reclamo.
             </div>
           </div>
-          <button className="btn" onClick={load} disabled={busy}>
-            Refrescar
-          </button>
         </div>
         <div style={{ height: 12 }} />
         {error && <div className="error">{error}</div>}
@@ -67,7 +51,7 @@ export default function StaffAssignedPage() {
                 <span className="pill">{STATUS_LABELS[c.status] ?? c.status}</span>
               </div>
               <div className="muted" style={{ fontSize: 13 }}>
-                Residente: {c.resident_username} • Ubicación: {c.location || '—'}
+                Residente: {c.resident_username} • Ubicación: {c.location || '-'}
               </div>
             </Link>
           ))}

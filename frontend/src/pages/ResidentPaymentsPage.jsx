@@ -141,15 +141,15 @@ export default function ResidentPaymentsPage() {
                         <strong>
                           {p.monthly_fee
                             ? `${MONTHS[p.monthly_fee.period_month - 1]} ${p.monthly_fee.period_year}`
-                            : '—'}
+                            : '-'}
                         </strong>
                         <span className={`pill ${STATUS_COLORS[p.status] || ''}`}>{STATUS_LABELS[p.status] ?? p.status}</span>
                       </div>
                       <div className="muted" style={{ fontSize: 13 }}>
                         ${Number(p.amount).toLocaleString('es-CL')} ·{' '}
                         {p.transaction_date
-                          ? new Date(p.transaction_date).toLocaleDateString()
-                          : new Date(p.created_at).toLocaleDateString()}
+                          ? new Date(p.transaction_date).toLocaleDateString('es-CL')
+                          : new Date(p.created_at).toLocaleDateString('es-CL')}
                       </div>
                       {p.authorization_code && (
                         <div className="muted" style={{ fontSize: 12 }}>

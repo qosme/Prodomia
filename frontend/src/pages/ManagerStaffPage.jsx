@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../api'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
+import PasswordInput from '../components/PasswordInput.jsx'
 
 export default function ManagerStaffPage() {
   const { user } = useAuth()
@@ -74,7 +75,7 @@ export default function ManagerStaffPage() {
             </div>
             <div className="field">
               <label>Temporary password</label>
-              <input type="password" value={form.password} onChange={(e) => update('password', e.target.value)} required />
+              <PasswordInput value={form.password} onChange={(e) => update('password', e.target.value)} required autoComplete="new-password" />
             </div>
             {error && <div className="error">{error}</div>}
             {success && <div className="success">{success}</div>}
@@ -90,7 +91,6 @@ export default function ManagerStaffPage() {
               <h2 style={{ margin: 0 }}>Staff users</h2>
               <div className="muted" style={{ marginTop: 6 }}>Assignable staff list.</div>
             </div>
-            <button className="btn" onClick={load}>Refresh</button>
           </div>
           <div style={{ height: 12 }} />
           <div className="list">
@@ -100,7 +100,7 @@ export default function ManagerStaffPage() {
                   <div style={{ fontWeight: 650 }}>{u.username}</div>
                   <span className="pill ok">staff</span>
                 </div>
-                <div className="muted" style={{ fontSize: 13 }}>{u.email || '—'}</div>
+                <div className="muted" style={{ fontSize: 13 }}>{u.email || '-'}</div>
               </div>
             ))}
             {staff.length === 0 && <div className="muted">No staff users yet.</div>}

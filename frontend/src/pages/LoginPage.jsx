@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth.jsx'
+import { useAuth } from '../useAuth.js'
+import PasswordInput from '../components/PasswordInput.jsx'
 
 export default function LoginPage() {
   const { login } = useAuth()
   const nav = useNavigate()
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -15,7 +16,7 @@ export default function LoginPage() {
     setError('')
     setBusy(true)
     try {
-      await login(username, password)
+      await login(email, password)
       nav('/')
     } catch (err) {
       setError(err.message || 'El inicio de sesión ha fallado')
@@ -32,16 +33,12 @@ export default function LoginPage() {
         <div style={{ height: 10 }} />
         <form onSubmit={onSubmit}>
           <div className="field">
-            <label>Nombre de Usuario</label>
-            <input value={username} onChange={(e) => setUsername(e.target.value)} />
+            <label>Correo Electrónico</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
           </div>
           <div className="field">
             <label>Contraseña</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
           </div>
           {error && <div className="error">{error}</div>}
           <div className="row" style={{ justifyContent: 'space-between', marginTop: 10 }}>

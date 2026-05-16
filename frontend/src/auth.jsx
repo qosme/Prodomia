@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { login as apiLogin, logout as apiLogout, me as apiMe } from './api'
-
-const AuthContext = createContext(null)
+import { AuthContext } from './authContext.js'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -22,8 +21,8 @@ export function AuthProvider({ children }) {
     refreshMe()
   }, [])
 
-  async function login(username, password) {
-    await apiLogin(username, password)
+  async function login(email, password) {
+    await apiLogin(email, password)
     await refreshMe()
   }
 
@@ -40,9 +39,4 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
-}
 

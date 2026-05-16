@@ -6,9 +6,13 @@ const MONTHS = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ]
 
+const ALL_UNITS = '__ALL__'
+
 export default function AdminFeesPage() {
   const [fees, setFees] = useState([])
+  const [units, setUnits] = useState([])
   const [loading, setLoading] = useState(true)
+  const [unitsLoading, setUnitsLoading] = useState(true)
   const [msg, setMsg] = useState('')
   const [error, setError] = useState('')
   const now = new Date()
@@ -29,23 +33,52 @@ export default function AdminFeesPage() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { loadFees() }, [])
+  useEffect(() => {
+    loadFees()
+    apiFetch('/users/')
+      .then((users) => {
+        const unitSet = new Set()
+        users
+          .filter((u) => u.resident_profile?.is_approved && u.resident_profile?.unit)
+          .forEach((u) => unitSet.add(u.resident_profile.unit))
+        setUnits(Array.from(unitSet).sort())
+      })
+      .catch(() => {})
+      .finally(() => setUnitsLoading(false))
+  }, [])
 
   const createFee = async (e) => {
     e.preventDefault()
     setCreating(true)
     setError('')
+    setMsg('')
+    const base = {
+      amount: parseFloat(form.amount),
+      period_year: parseInt(form.period_year),
+      period_month: parseInt(form.period_month),
+      due_date: form.due_date,
+    }
     try {
-      await apiFetch('/payments/monthly-fees/', {
-        method: 'POST',
-        body: JSON.stringify({
-          ...form,
-          amount: parseFloat(form.amount),
-          period_year: parseInt(form.period_year),
-          period_month: parseInt(form.period_month),
-        }),
-      })
-      setMsg('Cuota mensual creada.')
+      if (form.unit === ALL_UNITS) {
+        const results = await Promise.allSettled(
+          units.map((unit) =>
+            apiFetch('/payments/monthly-fees/', { method: 'POST', body: JSON.stringify({ ...base, unit }) })
+          )
+        )
+        const created = results.filter((r) => r.status === 'fulfilled').length
+        const skipped = results.length - created
+        setMsg(
+          skipped > 0
+            ? `Cuotas creadas: ${created}. Omitidas (ya existían): ${skipped}.`
+            : `Cuotas creadas para ${created} unidades.`
+        )
+      } else {
+        await apiFetch('/payments/monthly-fees/', {
+          method: 'POST',
+          body: JSON.stringify({ ...base, unit: form.unit }),
+        })
+        setMsg('Cuota mensual creada.')
+      }
       setForm({ unit: '', amount: '', period_year: now.getFullYear(), period_month: now.getMonth() + 1, due_date: '' })
       loadFees()
     } catch (err) {
@@ -78,12 +111,22 @@ export default function AdminFeesPage() {
           <div className="row">
             <div className="field" style={{ flex: 1 }}>
               <label>Unidad</label>
-              <input
+              <select
                 required
-                placeholder="ej. 101"
+                disabled={unitsLoading}
                 value={form.unit}
                 onChange={(e) => setForm({ ...form, unit: e.target.value })}
-              />
+              >
+                <option value="">
+                  {unitsLoading ? 'Cargando unidades…' : '- Seleccionar unidad -'}
+                </option>
+                {!unitsLoading && (
+                  <option value={ALL_UNITS}>Todas las unidades ({units.length})</option>
+                )}
+                {units.map((u) => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </select>
             </div>
             <div className="field" style={{ flex: 1 }}>
               <label>Monto (CLP)</label>
@@ -123,13 +166,14 @@ export default function AdminFeesPage() {
               <input
                 type="date"
                 required
+                min="2020-01-01"
                 value={form.due_date}
                 onChange={(e) => setForm({ ...form, due_date: e.target.value })}
               />
             </div>
           </div>
           <button className="btn primary" type="submit" disabled={creating}>
-            {creating ? 'Creando…' : 'Crear Cuota'}
+            {creating ? 'Creando…' : form.unit === ALL_UNITS ? `Crear para todas las unidades (${units.length})` : 'Crear Cuota'}
           </button>
         </form>
       </div>

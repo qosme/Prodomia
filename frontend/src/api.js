@@ -23,7 +23,11 @@ export async function apiFetch(path, options = {}) {
 
   if (!res.ok) {
     const message =
-      (data && typeof data === 'object' && (data.detail || JSON.stringify(data))) ||
+      (data && typeof data === 'object' && (
+        data.detail ||
+        (Array.isArray(data.non_field_errors) && data.non_field_errors[0]) ||
+        (typeof data === 'object' && Object.values(data).flat().find(v => typeof v === 'string'))
+      )) ||
       (typeof data === 'string' && data) ||
       `Request failed (${res.status})`
     const err = new Error(message)
@@ -35,10 +39,10 @@ export async function apiFetch(path, options = {}) {
   return data
 }
 
-export async function login(username, password) {
+export async function login(email, password) {
   const data = await apiFetch('/auth/token/', {
     method: 'POST',
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ email, password }),
   })
   localStorage.setItem('accessToken', data.access)
   localStorage.setItem('refreshToken', data.refresh)
@@ -59,5 +63,12 @@ export async function register(payload) {
 
 export async function me() {
   return apiFetch('/me/')
+}
+
+export async function changePassword(currentPassword, newPassword) {
+  return apiFetch('/auth/change-password/', {
+    method: 'POST',
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  })
 }
 
