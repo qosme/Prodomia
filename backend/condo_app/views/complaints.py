@@ -1,3 +1,7 @@
+import hashlib
+import os
+import time
+
 from django.db import transaction
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
@@ -126,6 +130,21 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         )
         complaint.refresh_from_db()
         return Response(ComplaintSerializer(complaint, context={"request": request}).data)
+
+    @extend_schema(
+        tags=["Reclamos"],
+        summary="Generar firma para subida a Cloudinary",
+        description="Retorna timestamp, firma y api_key para subir imágenes directamente a Cloudinary de forma segura.",
+    )
+    @action(detail=False, methods=["get"], url_path="cloudinary_signature")
+    def cloudinary_signature(self, request):
+        api_secret = os.environ.get("CLOUDINARY_API_SECRET", "")
+        api_key = os.environ.get("CLOUDINARY_API_KEY", "")
+        timestamp = int(time.time())
+        upload_preset = "prodomia_complaints"
+        params_to_sign = f"timestamp={timestamp}&upload_preset={upload_preset}"
+        signature = hashlib.sha1(f"{params_to_sign}{api_secret}".encode()).hexdigest()
+        return Response({"timestamp": timestamp, "signature": signature, "api_key": api_key, "upload_preset": upload_preset})
 
     @extend_schema(
         tags=["Reclamos"],
