@@ -63,13 +63,14 @@ export default function AdminResidentsPage() {
                 <th>Unidad</th>
                 <th>Teléfono</th>
                 <th>Estado</th>
+                <th>Activo</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="muted" style={{ textAlign: 'center', padding: 20 }}>
+                  <td colSpan={7} className="muted" style={{ textAlign: 'center', padding: 20 }}>
                     Sin residentes.
                   </td>
                 </tr>
@@ -83,6 +84,11 @@ export default function AdminResidentsPage() {
                   <td>
                     <span className={`pill ${u.resident_profile?.is_approved ? 'ok' : 'bad'}`}>
                       {u.resident_profile?.is_approved ? 'Aprobado' : 'Pendiente'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`pill ${u.is_active ? 'ok' : 'bad'}`}>
+                      {u.is_active ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
                   <td className="row" style={{ gap: 6 }}>
