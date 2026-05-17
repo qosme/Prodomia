@@ -21,10 +21,13 @@ def notify_package_received(package) -> None:
         f"Equipo Prodomia"
     )
 
-    send_mail(
-        subject="Tiene un paquete esperándolo - Prodomia",
-        message=body,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[resident.email],
-        fail_silently=True,
-    )
+    try:
+        send_mail(
+            subject="Tiene un paquete esperándolo - Prodomia",
+            message=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[resident.email],
+            fail_silently=False,
+        )
+    except Exception:
+        pass
