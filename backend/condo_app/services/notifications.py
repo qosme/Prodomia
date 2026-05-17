@@ -22,7 +22,7 @@ def notify_package_received(package) -> None:
     )
 
     send_mail(
-        subject="Tiene un paquete esperándolo – Prodomia",
+        subject="Tiene un paquete esperándolo - Prodomia",
         message=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[resident.email],
