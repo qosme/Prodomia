@@ -73,9 +73,13 @@ export default function ComplaintDetailPage() {
 
   async function uploadPhoto(file) {
     try {
+      const sigData = await apiFetch('/complaints/cloudinary_signature/')
       const fd = new FormData()
       fd.append('file', file)
-      fd.append('upload_preset', 'prodomia_complaints')
+      fd.append('api_key', sigData.api_key)
+      fd.append('timestamp', sigData.timestamp)
+      fd.append('signature', sigData.signature)
+      fd.append('upload_preset', sigData.upload_preset)
       const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
       const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
         method: 'POST',
