@@ -67,6 +67,7 @@ export default function ManagerHomePage() {
       title: 'Residentes',
       subtitle: loading ? '…' : stats ? `${stats.pending_approvals} pendiente${stats.pending_approvals !== 1 ? 's' : ''}` : '-',
       borderColor: stats?.pending_approvals > 0 ? 'rgba(234, 179, 8, 0.45)' : undefined,
+      alert: !loading && stats?.pending_approvals > 0,
     },
     {
       to: '/admin-dashboard/complaints',
@@ -119,8 +120,27 @@ export default function ManagerHomePage() {
                 textAlign: 'center',
                 padding: '24px 14px',
                 borderColor: card.borderColor,
+                position: 'relative',
               }}
             >
+              {card.alert && (
+                <div style={{
+                  position: 'absolute',
+                  top: 10,
+                  right: 12,
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  background: '#ef4444',
+                  color: '#fff',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: 1,
+                }}>!</div>
+              )}
               <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>{card.title}</div>
               <div className="muted" style={{ fontSize: 13 }}>{card.subtitle}</div>
             </div>

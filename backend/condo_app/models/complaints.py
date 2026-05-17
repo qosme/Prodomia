@@ -55,7 +55,7 @@ class ComplaintPhoto(models.Model):
     complaint = models.ForeignKey(
         Complaint, on_delete=models.CASCADE, related_name="photos"
     )
-    image = models.ImageField(upload_to="complaint_photos/%Y/%m/%d/")
+    image_url = models.URLField(max_length=500)
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,

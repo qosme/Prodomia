@@ -116,12 +116,12 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def upload_photo(self, request, pk=None):
         complaint = self.get_object()
-        image = request.FILES.get("image")
-        if not image:
-            return Response({"detail": "Falta el archivo 'image'."}, status=400)
+        image_url = request.data.get("image_url")
+        if not image_url:
+            return Response({"detail": "Falta el campo 'image_url'."}, status=400)
         ComplaintPhoto.objects.create(
             complaint=complaint,
-            image=image,
+            image_url=image_url,
             uploaded_by=request.user,
         )
         complaint.refresh_from_db()

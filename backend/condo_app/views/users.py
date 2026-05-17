@@ -108,6 +108,18 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
 
     @extend_schema(
         tags=["Usuarios"],
+        summary="Activar usuario",
+        description="Reactiva la cuenta de un usuario (`is_active = true`). El usuario podrá volver a iniciar sesión.",
+    )
+    @action(detail=True, methods=["post"])
+    def activate(self, request, pk=None):
+        user = self.get_object()
+        user.is_active = True
+        user.save(update_fields=["is_active"])
+        return Response(UserSerializer(user).data)
+
+    @extend_schema(
+        tags=["Usuarios"],
         summary="Desactivar staff",
         description="Desactiva el perfil de staff de un usuario (`is_active_staff = false`) sin eliminar su cuenta.",
     )

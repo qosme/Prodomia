@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { apiFetch } from '../api'
@@ -32,6 +32,7 @@ export default function ComplaintDetailPage() {
 
   const canManage = useMemo(() => user?.role === 'manager', [user])
   const canStaffUpdate = useMemo(() => user?.role === 'staff', [user])
+  const fileInputRef = useRef(null)
 
   async function load() {
     setError('')
@@ -71,10 +72,21 @@ export default function ComplaintDetailPage() {
   }
 
   async function uploadPhoto(file) {
-    const fd = new FormData()
-    fd.append('image', file)
     try {
-      await apiFetch(`/complaints/${id}/upload_photo/`, { method: 'POST', body: fd })
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('upload_preset', 'prodomia_complaints')
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: fd,
+      })
+      if (!res.ok) throw new Error('Error al subir imagen a Cloudinary')
+      const cloudData = await res.json()
+      await apiFetch(`/complaints/${id}/upload_photo/`, {
+        method: 'POST',
+        body: JSON.stringify({ image_url: cloudData.secure_url }),
+      })
       await load()
     } catch (err) {
       setError(err.message || 'Failed to upload photo')
@@ -131,14 +143,19 @@ export default function ComplaintDetailPage() {
             <h2>Fotos</h2>
             <div className="row">
               <input
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                style={{ display: 'none' }}
                 onChange={(e) => {
                   const f = e.target.files?.[0]
                   if (f) uploadPhoto(f)
                   e.target.value = ''
                 }}
               />
+              <button className="btn" type="button" onClick={() => fileInputRef.current?.click()}>
+                Elegir archivo
+              </button>
             </div>
             <div style={{ height: 8 }} />
             <div className="row" style={{ gap: 8 }}>
