@@ -90,7 +90,7 @@ export default function ConciergePage() {
                 value={form.resident}
                 onChange={(e) => setForm({ ...form, resident: e.target.value })}
               >
-                <option value="">— Seleccionar residente —</option>
+                <option value="">- Seleccionar residente -</option>
                 {residents.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.username}
