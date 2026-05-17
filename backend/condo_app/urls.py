@@ -6,6 +6,7 @@ from . import views
 router = DefaultRouter()
 router.register(r"complaints", views.ComplaintViewSet, basename="complaint")
 router.register(r"users", views.UserAdminViewSet, basename="user-admin")
+router.register(r"packages", views.PackageViewSet, basename="package")
 
 urlpatterns = [
     path("", include(router.urls)),

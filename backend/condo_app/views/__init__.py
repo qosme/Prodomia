@@ -3,6 +3,7 @@ from rest_framework_simplejwt.views import TokenRefreshView as _BaseTokenRefresh
 
 from .auth import ChangePasswordView, MeView, RegisterView, TokenObtainPairView
 from .complaints import ComplaintViewSet
+from .packages import PackageViewSet
 from .users import UserAdminViewSet
 
 TokenRefreshView = extend_schema(
@@ -17,6 +18,7 @@ __all__ = [
     "ChangePasswordView",
     "UserAdminViewSet",
     "ComplaintViewSet",
+    "PackageViewSet",
     "TokenObtainPairView",
     "TokenRefreshView",
 ]

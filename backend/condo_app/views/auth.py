@@ -9,7 +9,7 @@ from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer as BaseTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView as BaseTokenObtainPairView
 
-from ..permissions import is_manager, is_staff_user
+from ..permissions import is_concierge_user, is_manager, is_staff_user
 from ..serializers import RegisterSerializer, UserSerializer
 
 
@@ -74,16 +74,28 @@ class RegisterView(APIView):
         summary="Mi perfil",
         description=(
             "Retorna los datos del usuario autenticado junto con su **rol** "
-            "(`manager`, `staff` o `resident`) y su estado de aprobación."
+            "(`manager`, `staff`, `concierge` o `resident`) y su estado de aprobación."
         ),
         responses={200: UserSerializer},
-    )
+    ),
+    patch=extend_schema(
+        tags=["Autenticación"],
+        summary="Actualizar mi perfil",
+        description="Actualiza el nombre de usuario y/o email del usuario autenticado.",
+        request=inline_serializer(
+            name="UpdateProfileRequest",
+            fields={
+                "username": drf_serializers.CharField(required=False),
+                "email": drf_serializers.EmailField(required=False),
+            },
+        ),
+        responses={200: UserSerializer},
+    ),
 )
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        user = request.user
+    def _build_response(self, user):
         role = "resident"
         approved = False
         if is_manager(user):
@@ -92,13 +104,38 @@ class MeView(APIView):
         elif is_staff_user(user):
             role = "staff"
             approved = True
+        elif is_concierge_user(user):
+            role = "concierge"
+            approved = True
         else:
             profile = getattr(user, "resident_profile", None)
             approved = bool(profile and profile.is_approved)
         data = UserSerializer(user).data
         data["role"] = role
         data["approved"] = approved
-        return Response(data)
+        return data
+
+    def get(self, request):
+        return Response(self._build_response(request.user))
+
+    def patch(self, request):
+        User = get_user_model()
+        user = request.user
+        username = request.data.get("username", "").strip()
+        email = request.data.get("email", "").strip()
+
+        if username and username != user.username:
+            if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+                return Response({"detail": "Ese nombre de usuario ya está en uso."}, status=status.HTTP_400_BAD_REQUEST)
+            user.username = username
+
+        if email and email != user.email:
+            if User.objects.filter(email__iexact=email).exclude(pk=user.pk).exists():
+                return Response({"detail": "Ese email ya está en uso."}, status=status.HTTP_400_BAD_REQUEST)
+            user.email = email
+
+        user.save(update_fields=["username", "email"])
+        return Response(self._build_response(user))
 
 
 @extend_schema_view(

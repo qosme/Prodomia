@@ -32,6 +32,7 @@ export default function ResidentHomePage() {
   const [payments, setPayments] = useState([])
   const [fee, setFee] = useState(null)
   const [announcements, setAnnouncements] = useState([])
+  const [pendingPackages, setPendingPackages] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -41,12 +42,14 @@ export default function ResidentHomePage() {
       apiFetch('/payments/payments/my_payments/'),
       apiFetch('/payments/monthly-fees/my_fee/').catch(() => null),
       apiFetch('/payments/announcements/'),
+      apiFetch('/packages/my_packages/').catch(() => []),
     ])
-      .then(([c, p, f, a]) => {
+      .then(([c, p, f, a, pkgs]) => {
         setComplaints(c)
         setPayments(p)
         setFee(f)
         setAnnouncements(a)
+        setPendingPackages(pkgs.filter((pkg) => pkg.status === 'PENDING').length)
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
@@ -119,6 +122,13 @@ export default function ResidentHomePage() {
       alert: !loading && fee && !currentFeePaid,
     },
     {
+      to: '/packages',
+      title: 'Mis Pedidos',
+      subtitle: loading ? '…' : pendingPackages > 0 ? `${pendingPackages} pendiente${pendingPackages !== 1 ? 's' : ''}` : 'Sin pedidos pendientes',
+      borderColor: pendingPackages > 0 ? 'rgba(234, 179, 8, 0.5)' : undefined,
+      alert: !loading && pendingPackages > 0,
+    },
+    {
       to: '/announcements',
       title: 'Anuncios',
       subtitle: loading ? '…' : `${announcements.length} publicado${announcements.length !== 1 ? 's' : ''}`,
@@ -144,7 +154,7 @@ export default function ResidentHomePage() {
 
       {error && <p className="error">{error}</p>}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 28 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 28 }}>
         {navCards.map((card) => (
           <Link key={card.to} to={card.to} style={{ textDecoration: 'none' }}>
             <div

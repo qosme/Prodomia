@@ -8,6 +8,8 @@ from .models import (
     ComplaintComment,
     ComplaintPhoto,
     ComplaintStatusHistory,
+    ConciergeProfile,
+    Package,
     ResidentProfile,
     StaffProfile,
 )
@@ -25,6 +27,20 @@ class StaffProfileAdmin(admin.ModelAdmin):
     list_display = ["user", "is_active_staff", "created_at"]
     list_filter = ["is_active_staff"]
     search_fields = ["user__username"]
+
+
+@admin.register(ConciergeProfile)
+class ConciergeProfileAdmin(admin.ModelAdmin):
+    list_display = ["user", "is_active_concierge", "created_at"]
+    list_filter = ["is_active_concierge"]
+    search_fields = ["user__username"]
+
+
+@admin.register(Package)
+class PackageAdmin(admin.ModelAdmin):
+    list_display = ["id", "resident", "description", "carrier", "status", "received_by", "received_at", "delivered_at"]
+    list_filter = ["status", "received_at"]
+    search_fields = ["resident__username", "description", "carrier"]
 
 
 @admin.register(Complaint)

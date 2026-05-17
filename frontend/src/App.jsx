@@ -8,10 +8,13 @@ import StaffAssignedPage from './pages/StaffAssignedPage.jsx'
 import AnnouncementsPage from './pages/AnnouncementsPage.jsx'
 import ResidentPaymentsPage from './pages/ResidentPaymentsPage.jsx'
 import ResidentComplaintsPage from './pages/ResidentComplaintsPage.jsx'
+import ResidentPackagesPage from './pages/ResidentPackagesPage.jsx'
+import ConciergePage from './pages/ConciergePage.jsx'
 import AdminDashboardLayout from './pages/admin/AdminDashboardLayout.jsx'
 import AdminOverviewPage from './pages/admin/AdminOverviewPage.jsx'
 import AdminResidentsPage from './pages/admin/AdminResidentsPage.jsx'
 import AdminStaffPage from './pages/admin/AdminStaffPage.jsx'
+import AdminConciergePage from './pages/admin/AdminConciergePage.jsx'
 import AdminFeesPage from './pages/admin/AdminFeesPage.jsx'
 import AdminPaymentsPage from './pages/admin/AdminPaymentsPage.jsx'
 import AdminAnnouncementsPage from './pages/admin/AdminAnnouncementsPage.jsx'
@@ -39,9 +42,11 @@ function AppNav() {
         <div className="tabs">
           {user ? (
             <>
-              <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/" end>
-                {role === 'staff' ? 'Dashboard' : 'Inicio'}
-              </NavLink>
+              {role !== 'concierge' && (
+                <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/" end>
+                  {role === 'staff' ? 'Dashboard' : 'Inicio'}
+                </NavLink>
+              )}
               {(role === 'resident' || (role === 'manager' && hasResidentProfile)) && (
                 <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/complaints">
                   Mis Reclamos
@@ -50,6 +55,16 @@ function AppNav() {
               {(role === 'resident' || (role === 'manager' && hasResidentProfile)) && (
                 <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/payments">
                   Mis Pagos
+                </NavLink>
+              )}
+              {(role === 'resident' || (role === 'manager' && hasResidentProfile)) && (
+                <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/packages">
+                  Mis Pedidos
+                </NavLink>
+              )}
+              {role === 'concierge' && (
+                <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/concierge">
+                  Pedidos
                 </NavLink>
               )}
               {role === 'manager' && (
@@ -105,8 +120,12 @@ export default function App() {
         {/* Páginas para residentes */}
         <Route path="/complaints" element={<Guarded><ResidentComplaintsPage /></Guarded>} />
         <Route path="/payments" element={<Guarded><ResidentPaymentsPage /></Guarded>} />
+        <Route path="/packages" element={<Guarded><ResidentPackagesPage /></Guarded>} />
         <Route path="/announcements" element={<Guarded><AnnouncementsPage /></Guarded>} />
         <Route path="/settings" element={<Guarded><UserSettingsPage /></Guarded>} />
+
+        {/* Página para conserje */}
+        <Route path="/concierge" element={<Guarded><ConciergePage /></Guarded>} />
 
         {/* Páginas para administración (rutas anidadadas con diseño de sidebar) */}
         <Route
@@ -116,6 +135,7 @@ export default function App() {
           <Route index element={<AdminOverviewPage />} />
           <Route path="residents" element={<AdminResidentsPage />} />
           <Route path="staff" element={<AdminStaffPage />} />
+          <Route path="concierge" element={<AdminConciergePage />} />
           <Route path="fees" element={<AdminFeesPage />} />
           <Route path="payments" element={<AdminPaymentsPage />} />
           <Route path="announcements" element={<AdminAnnouncementsPage />} />

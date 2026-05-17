@@ -31,6 +31,12 @@ export default function AdminDashboardLayout() {
             Personal
           </NavLink>
           <NavLink
+            to="/admin-dashboard/concierge"
+            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+          >
+            Conserjería
+          </NavLink>
+          <NavLink
             to="/admin-dashboard/fees"
             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
           >
