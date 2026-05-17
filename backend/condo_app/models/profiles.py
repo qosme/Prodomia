@@ -28,3 +28,16 @@ class StaffProfile(models.Model):
 
     def __str__(self) -> str:
         return f"StaffProfile(user_id={self.user_id}, active={self.is_active_staff})"
+
+
+class ConciergeProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="concierge_profile",
+    )
+    is_active_concierge = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"ConciergeProfile(user_id={self.user_id}, active={self.is_active_concierge})"

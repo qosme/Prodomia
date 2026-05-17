@@ -5,9 +5,9 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..models import ResidentProfile, StaffProfile
-from ..permissions import IsManager
-from ..serializers import CreateStaffSerializer, UserSerializer
+from ..models import ConciergeProfile, ResidentProfile, StaffProfile
+from ..permissions import IsConcierge, IsManager
+from ..serializers import CreateConciergeSerializer, CreateStaffSerializer, UserSerializer
 
 User = get_user_model()
 
@@ -29,6 +29,20 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
 
     def get_queryset(self):
         return User.objects.all().order_by("id")
+
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Residentes aprobados",
+        description="Lista los residentes aprobados. Accesible por **administrador** y **conserje**.",
+    )
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated, IsManager | IsConcierge])
+    def approved_residents(self, request):
+        users = (
+            User.objects.filter(resident_profile__is_approved=True)
+            .select_related("resident_profile")
+            .order_by("username")
+        )
+        return Response(UserSerializer(users, many=True).data)
 
     @extend_schema(
         tags=["Usuarios"],
@@ -130,4 +144,58 @@ class UserAdminViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
         if profile:
             profile.is_active_staff = False
             profile.save(update_fields=["is_active_staff"])
+        return Response(UserSerializer(user).data)
+
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Listar conserjes",
+        description="Retorna todos los usuarios con perfil de **conserje**.",
+    )
+    @action(detail=False, methods=["get"])
+    def concierges(self, request):
+        users = (
+            User.objects.filter(concierge_profile__isnull=False)
+            .select_related("concierge_profile")
+            .order_by("id")
+        )
+        return Response(UserSerializer(users, many=True).data)
+
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Crear conserje",
+        description="Crea un nuevo usuario con rol de **conserje** directamente.",
+    )
+    @action(detail=False, methods=["post"])
+    def create_concierge(self, request):
+        serializer = CreateConciergeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Desactivar conserje",
+        description="Desactiva el perfil de conserje de un usuario sin eliminar su cuenta.",
+    )
+    @action(detail=True, methods=["post"])
+    def deactivate_concierge(self, request, pk=None):
+        user = self.get_object()
+        profile = getattr(user, "concierge_profile", None)
+        if profile:
+            profile.is_active_concierge = False
+            profile.save(update_fields=["is_active_concierge"])
+        return Response(UserSerializer(user).data)
+
+    @extend_schema(
+        tags=["Usuarios"],
+        summary="Activar conserje",
+        description="Reactiva el perfil de conserje de un usuario.",
+    )
+    @action(detail=True, methods=["post"])
+    def activate_concierge(self, request, pk=None):
+        user = self.get_object()
+        profile = getattr(user, "concierge_profile", None)
+        if profile:
+            profile.is_active_concierge = True
+            profile.save(update_fields=["is_active_concierge"])
         return Response(UserSerializer(user).data)

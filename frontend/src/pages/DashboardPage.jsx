@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { apiFetch } from '../api'
 import { useAuth } from '../useAuth.js'
 import ResidentHomePage from './ResidentHomePage.jsx'
@@ -67,6 +67,7 @@ export default function DashboardPage() {
 
   if (user?.role === 'resident') return <ResidentHomePage />
   if (user?.role === 'manager') return <ManagerHomePage />
+  if (user?.role === 'concierge') return <Navigate to="/concierge" replace />
 
   return (
     <div className="container">

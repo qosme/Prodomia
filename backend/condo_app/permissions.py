@@ -9,6 +9,13 @@ def is_staff_user(user) -> bool:
     return bool(user and user.is_authenticated and hasattr(user, "staff_profile"))
 
 
+def is_concierge_user(user) -> bool:
+    if not (user and user.is_authenticated):
+        return False
+    profile = getattr(user, "concierge_profile", None)
+    return bool(profile and profile.is_active_concierge)
+
+
 def is_approved_resident(user) -> bool:
     if not (user and user.is_authenticated):
         return False
@@ -24,6 +31,11 @@ class IsManager(BasePermission):
 class IsStaff(BasePermission):
     def has_permission(self, request, view):
         return is_staff_user(request.user)
+
+
+class IsConcierge(BasePermission):
+    def has_permission(self, request, view):
+        return is_concierge_user(request.user)
 
 
 class IsApprovedResident(BasePermission):

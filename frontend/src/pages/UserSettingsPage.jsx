@@ -1,38 +1,71 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../useAuth.js'
-import { changePassword } from '../api'
+import { apiFetch, changePassword } from '../api'
 import PasswordInput from '../components/PasswordInput.jsx'
 
-const ROLE_LABEL = { resident: 'Residente', manager: 'Administrador', staff: 'Personal' }
+const ROLE_LABEL = { resident: 'Residente', manager: 'Administrador', staff: 'Personal', concierge: 'Conserje' }
 
 export default function UserSettingsPage() {
-  const { user } = useAuth()
+  const { user, refreshMe } = useAuth()
+
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [infoError, setInfoError] = useState('')
+  const [infoSuccess, setInfoSuccess] = useState('')
+  const [infoLoading, setInfoLoading] = useState(false)
+
   const [currentPw, setCurrentPw] = useState('')
   const [newPw, setNewPw] = useState('')
   const [confirmPw, setConfirmPw] = useState('')
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [pwError, setPwError] = useState('')
+  const [pwSuccess, setPwSuccess] = useState('')
+  const [pwLoading, setPwLoading] = useState(false)
 
-  async function handleSubmit(e) {
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username)
+      setEmail(user.email || '')
+    }
+  }, [user])
+
+  async function handleInfoSubmit(e) {
     e.preventDefault()
-    setError('')
-    setSuccess('')
+    setInfoError('')
+    setInfoSuccess('')
+    setInfoLoading(true)
+    try {
+      await apiFetch('/me/', {
+        method: 'PATCH',
+        body: JSON.stringify({ username, email }),
+      })
+      await refreshMe()
+      setInfoSuccess('Información actualizada.')
+    } catch (err) {
+      setInfoError(err.message || 'Error al actualizar.')
+    } finally {
+      setInfoLoading(false)
+    }
+  }
+
+  async function handlePwSubmit(e) {
+    e.preventDefault()
+    setPwError('')
+    setPwSuccess('')
     if (newPw !== confirmPw) {
-      setError('Las contraseñas nuevas no coinciden.')
+      setPwError('Las contraseñas nuevas no coinciden.')
       return
     }
-    setLoading(true)
+    setPwLoading(true)
     try {
       await changePassword(currentPw, newPw)
-      setSuccess('Contraseña cambiada exitosamente.')
+      setPwSuccess('Contraseña cambiada exitosamente.')
       setCurrentPw('')
       setNewPw('')
       setConfirmPw('')
     } catch (err) {
-      setError(err.message || 'Error al cambiar la contraseña.')
+      setPwError(err.message || 'Error al cambiar la contraseña.')
     } finally {
-      setLoading(false)
+      setPwLoading(false)
     }
   }
 
@@ -42,25 +75,30 @@ export default function UserSettingsPage() {
 
       <div className="card" style={{ marginBottom: 14 }}>
         <h2 className="settings-section-title">Información</h2>
-        <div className="field">
-          <label>Usuario</label>
-          <input value={user.username} readOnly />
-        </div>
-        {user.email && (
+        <form onSubmit={handleInfoSubmit}>
+          <div className="field">
+            <label>Usuario</label>
+            <input value={username} onChange={(e) => setUsername(e.target.value)} required />
+          </div>
           <div className="field">
             <label>Email</label>
-            <input value={user.email} readOnly />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
-        )}
-        <div className="field">
-          <label>Rol</label>
-          <div><span className="pill">{ROLE_LABEL[user.role] ?? user.role}</span></div>
-        </div>
+          <div className="field">
+            <label>Rol</label>
+            <div><span className="pill">{ROLE_LABEL[user?.role] ?? user?.role}</span></div>
+          </div>
+          {infoError && <p className="error">{infoError}</p>}
+          {infoSuccess && <p className="success">{infoSuccess}</p>}
+          <button className="btn primary" type="submit" disabled={infoLoading} style={{ width: '100%' }}>
+            {infoLoading ? 'Guardando…' : 'Guardar Cambios'}
+          </button>
+        </form>
       </div>
 
       <div className="card">
         <h2 className="settings-section-title">Cambiar Contraseña</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handlePwSubmit}>
           <div className="field">
             <label>Contraseña actual</label>
             <PasswordInput value={currentPw} onChange={e => setCurrentPw(e.target.value)} required autoComplete="current-password" />
@@ -73,10 +111,10 @@ export default function UserSettingsPage() {
             <label>Confirmar nueva contraseña</label>
             <PasswordInput value={confirmPw} onChange={e => setConfirmPw(e.target.value)} required autoComplete="new-password" />
           </div>
-          {error && <p className="error">{error}</p>}
-          {success && <p className="success">{success}</p>}
-          <button className="btn primary" type="submit" disabled={loading} style={{ width: '100%' }}>
-            {loading ? 'Guardando…' : 'Cambiar Contraseña'}
+          {pwError && <p className="error">{pwError}</p>}
+          {pwSuccess && <p className="success">{pwSuccess}</p>}
+          <button className="btn primary" type="submit" disabled={pwLoading} style={{ width: '100%' }}>
+            {pwLoading ? 'Guardando…' : 'Cambiar Contraseña'}
           </button>
         </form>
       </div>
