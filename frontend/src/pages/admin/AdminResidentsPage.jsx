@@ -46,6 +46,16 @@ export default function AdminResidentsPage() {
     }
   }
 
+  const activate = async (id) => {
+    try {
+      await apiFetch(`/users/${id}/activate/`, { method: 'POST' })
+      setMsg('Usuario activado.')
+      loadResidents()
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
   return (
     <div>
       <h2 className="admin-page-title">Residentes</h2>
@@ -92,14 +102,20 @@ export default function AdminResidentsPage() {
                     </span>
                   </td>
                   <td className="row" style={{ gap: 6 }}>
-                    {!u.resident_profile?.is_approved && (
+                    {!u.resident_profile?.is_approved && u.is_active && (
                       <button className="btn primary" style={{ fontSize: 13, padding: '6px 10px' }} onClick={() => approve(u.id)}>
                         Aprobar
                       </button>
                     )}
-                    <button className="btn danger" style={{ fontSize: 13, padding: '6px 10px' }} onClick={() => deactivate(u.id)}>
-                      Desactivar
-                    </button>
+                    {u.is_active ? (
+                      <button className="btn danger" style={{ fontSize: 13, padding: '6px 10px' }} onClick={() => deactivate(u.id)}>
+                        Desactivar
+                      </button>
+                    ) : (
+                      <button className="btn primary" style={{ fontSize: 13, padding: '6px 10px' }} onClick={() => activate(u.id)}>
+                        Activar
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

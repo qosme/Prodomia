@@ -52,7 +52,7 @@ class DashboardStatsView(APIView):
             .distinct()
             .count()
         )
-        pending_approvals = ResidentProfile.objects.filter(is_approved=False).count()
+        pending_approvals = ResidentProfile.objects.filter(is_approved=False, user__is_active=True).count()
         open_complaints = Complaint.objects.exclude(
             status__in=["RESOLVED", "CLOSED", "REJECTED"]
         ).count()
