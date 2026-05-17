@@ -53,8 +53,8 @@ export default function RegisterPage() {
           </div>
           <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="field">
-              <label>Unidad (opcional)</label>
-              <input value={form.unit} onChange={(e) => update('unit', e.target.value)} />
+              <label>Unidad</label>
+              <input value={form.unit} onChange={(e) => update('unit', e.target.value)} required />
             </div>
             <div className="field">
               <label>Teléfono (opcional)</label>

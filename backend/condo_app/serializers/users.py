@@ -10,7 +10,7 @@ class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
-    unit = serializers.CharField(required=False, allow_blank=True)
+    unit = serializers.CharField()
     phone = serializers.CharField(required=False, allow_blank=True)
 
     def validate_username(self, value: str) -> str:
