@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../api.js'
+import { useAuth } from '../useAuth.js'
 
 const STATUS_LABELS = {
   PENDING: 'Pendiente de retiro',
@@ -29,16 +30,35 @@ function PackageRow({ pkg }) {
 }
 
 export default function ResidentPackagesPage() {
+  const { user, loading: authLoading } = useAuth()
   const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const approved = (user?.role === 'resident' && user?.approved) ||
+    (user?.role === 'manager' && user?.resident_profile != null)
+
   useEffect(() => {
+    if (authLoading || !approved) return
     apiFetch('/packages/my_packages/')
       .then(setPackages)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
-  }, [])
+  }, [authLoading, approved])
+
+  if (!authLoading && !approved) {
+    return (
+      <div className="container">
+        <h2 style={{ margin: '0 0 4px' }}>Mis Pedidos</h2>
+        <div className="card" style={{ marginTop: 20 }}>
+          <span className="pill bad">No aprobado</span>
+          <p className="muted" style={{ marginTop: 8, fontSize: 14 }}>
+            Podrás ver tus pedidos una vez que tu cuenta sea aprobada por el administrador.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   const pending = packages.filter((p) => p.status === 'PENDING')
   const delivered = packages.filter((p) => p.status === 'DELIVERED')
@@ -52,7 +72,7 @@ export default function ResidentPackagesPage() {
 
       {error && <p className="error">{error}</p>}
 
-      {loading ? (
+      {authLoading || loading ? (
         <p className="muted">Cargando…</p>
       ) : (
         <>
