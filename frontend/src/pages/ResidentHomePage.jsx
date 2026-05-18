@@ -86,7 +86,7 @@ export default function ResidentHomePage() {
       }
     }
 
-    for (const p of payments) {
+    for (const p of payments.filter((p) => p.status === 'PAID' || p.status === 'MANUAL')) {
       items.push({
         at: p.transaction_date || p.created_at,
         text: `Pago de $${Number(p.amount).toLocaleString('es-CL')} CLP registrado`,
