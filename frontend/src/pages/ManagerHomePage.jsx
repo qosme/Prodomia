@@ -73,7 +73,8 @@ export default function ManagerHomePage() {
       to: '/admin-dashboard/complaints',
       title: 'Reclamos',
       subtitle: loading ? '…' : `${openComplaints.length} abierto${openComplaints.length !== 1 ? 's' : ''}`,
-      borderColor: openComplaints.length > 0 ? 'rgba(37, 99, 235, 0.4)' : undefined,
+      borderColor: complaints.some((c) => c.status === 'NEW') ? 'rgba(239, 68, 68, 0.35)' : openComplaints.length > 0 ? 'rgba(37, 99, 235, 0.4)' : undefined,
+      alert: !loading && complaints.some((c) => c.status === 'NEW'),
     },
     {
       to: '/admin-dashboard/staff',
