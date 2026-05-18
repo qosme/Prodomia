@@ -28,6 +28,14 @@ function Guarded({ children }) {
   return children
 }
 
+function RootRedirect() {
+  const { user, loading } = useAuth()
+  if (loading) return <div className="container"><div className="card">Loading…</div></div>
+  if (!user) return <Navigate to="/login" replace />
+  if (user.role === 'staff') return <Navigate to="/staff/assigned" replace />
+  return <DashboardPage />
+}
+
 function AppNav() {
   const { user, logout } = useAuth()
   const role = user?.role
@@ -42,9 +50,9 @@ function AppNav() {
         <div className="tabs">
           {user ? (
             <>
-              {role !== 'concierge' && (
+              {role !== 'concierge' && role !== 'staff' && (
                 <NavLink className={({ isActive }) => `tab ${isActive ? 'active' : ''}`} to="/" end>
-                  {role === 'staff' ? 'Dashboard' : 'Inicio'}
+                  Inicio
                 </NavLink>
               )}
               {(role === 'resident' || (role === 'manager' && hasResidentProfile)) && (
@@ -111,7 +119,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route path="/" element={<Guarded><DashboardPage /></Guarded>} />
+        <Route path="/" element={<RootRedirect />} />
         <Route path="/complaints/:id" element={<Guarded><ComplaintDetailPage /></Guarded>} />
 
 

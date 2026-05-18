@@ -196,6 +196,16 @@ textarea {
   color: rgba(239, 68, 68, 0.95);
 }
 
+.pill.warn {
+  border-color: rgba(234, 179, 8, 0.55);
+  color: rgba(234, 179, 8, 0.95);
+}
+
+.pill.info {
+  border-color: rgba(59, 130, 246, 0.55);
+  color: rgba(59, 130, 246, 0.95);
+}
+
 .list {
   display: grid;
   gap: 10px;

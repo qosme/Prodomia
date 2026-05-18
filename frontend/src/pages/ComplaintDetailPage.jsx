@@ -13,10 +13,17 @@ const STATUS_LABELS = {
   CLOSED: 'Cerrado',
 }
 
+const STATUS_COLOR = {
+  NEW: 'warn',
+  ASSIGNED: 'warn',
+  IN_PROGRESS: 'info',
+  RESOLVED: 'ok',
+  REJECTED: 'bad',
+  CLOSED: 'ok',
+}
+
 function StatusPill({ status }) {
-  const ok = status === 'RESOLVED' || status === 'CLOSED'
-  const bad = status === 'REJECTED'
-  return <span className={`pill ${ok ? 'ok' : bad ? 'bad' : ''}`}>{STATUS_LABELS[status] ?? status}</span>
+  return <span className={`pill ${STATUS_COLOR[status] ?? ''}`}>{STATUS_LABELS[status] ?? status}</span>
 }
 
 const STATUSES = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'CLOSED']
@@ -188,7 +195,7 @@ export default function ComplaintDetailPage() {
                   e.target.value = ''
                 }}
               />
-              {!deleteMode && (!canManage || data.resident === user?.id) && (
+              {!deleteMode && !canStaffUpdate && (!canManage || data.resident === user?.id) && (
                 <>
                   <button className="btn primary" type="button" onClick={() => fileInputRef.current?.click()}>
                     Elegir archivo

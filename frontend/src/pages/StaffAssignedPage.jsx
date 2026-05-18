@@ -12,6 +12,19 @@ const STATUS_LABELS = {
   CLOSED: 'Cerrado',
 }
 
+const STATUS_COLOR = {
+  NEW: 'warn',
+  ASSIGNED: 'warn',
+  IN_PROGRESS: 'info',
+  RESOLVED: 'ok',
+  REJECTED: 'bad',
+  CLOSED: 'ok',
+}
+
+function StatusPill({ status }) {
+  return <span className={`pill ${STATUS_COLOR[status] ?? ''}`}>{STATUS_LABELS[status] ?? status}</span>
+}
+
 export default function StaffAssignedPage() {
   const { user } = useAuth()
   const [items, setItems] = useState([])
@@ -48,7 +61,7 @@ export default function StaffAssignedPage() {
             <Link key={c.id} className="item" to={`/complaints/${c.id}`}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <div style={{ fontWeight: 650 }}>{c.title}</div>
-                <span className="pill">{STATUS_LABELS[c.status] ?? c.status}</span>
+                <StatusPill status={c.status} />
               </div>
               <div className="muted" style={{ fontSize: 13 }}>
                 Residente: {c.resident_username} • Ubicación: {c.location || '-'}
