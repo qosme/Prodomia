@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../../api.js'
 
-const STATUS_COLORS = {
-  PAID: 'ok',
-  MANUAL: 'ok',
-  PENDING: '',
-  FAILED: 'bad',
-}
-
 const MONTHS = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
@@ -17,7 +10,16 @@ const STATUS_LABELS = {
   PAID: 'Pagado (WebPay)',
   MANUAL: 'Pagado (Manual)',
   PENDING: 'Pendiente',
+  PENDING_WEBPAY: 'Abandonado (WebPay)',
   FAILED: 'Fallido',
+}
+
+const STATUS_COLORS = {
+  PAID: 'ok',
+  MANUAL: 'ok',
+  PENDING: '',
+  PENDING_WEBPAY: 'bad',
+  FAILED: 'bad',
 }
 
 export default function AdminPaymentsPage() {
@@ -214,7 +216,10 @@ export default function AdminPaymentsPage() {
                     </td>
                     <td>${Number(p.amount).toLocaleString('es-CL')}</td>
                     <td>
-                      <span className={`pill ${STATUS_COLORS[p.status] || ''}`}>{STATUS_LABELS[p.status] ?? p.status}</span>
+                      {(() => {
+                        const key = p.status === 'PENDING' && p.token ? 'PENDING_WEBPAY' : p.status
+                        return <span className={`pill ${STATUS_COLORS[key] || ''}`}>{STATUS_LABELS[key] ?? p.status}</span>
+                      })()}
                     </td>
                     <td>
                       {p.transaction_date
@@ -222,7 +227,7 @@ export default function AdminPaymentsPage() {
                         : new Date(p.created_at).toLocaleDateString('es-CL')}
                     </td>
                     <td>
-                      {p.status === 'PENDING' && (
+                      {p.status === 'PENDING' && !p.token && (
                         <button
                           className="btn primary"
                           style={{ fontSize: 13, padding: '6px 10px' }}

@@ -114,6 +114,50 @@ class PaymentViewSet(
 
     @extend_schema(
         tags=["Pagos"],
+        summary="Solicitar pago manual",
+        description="El **residente aprobado** registra un pago manual pendiente de aprobación por el administrador.",
+        request=WebpayInitSerializer,
+    )
+    @action(detail=False, methods=["post"], url_path="request_manual")
+    def request_manual(self, request):
+        if not is_approved_resident(request.user):
+            return Response({"detail": "Solo los residentes aprobados pueden solicitar pagos manuales."}, status=403)
+
+        ser = WebpayInitSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        fee_id = ser.validated_data["monthly_fee_id"]
+
+        try:
+            fee = MonthlyFee.objects.get(pk=fee_id)
+        except MonthlyFee.DoesNotExist:
+            return Response({"detail": "Cuota mensual no encontrada."}, status=404)
+
+        profile = request.user.resident_profile
+        if fee.unit != profile.unit:
+            return Response({"detail": "Esta cuota no pertenece a tu unidad."}, status=403)
+
+        already_paid = Payment.objects.filter(
+            monthly_fee=fee,
+            status__in=[Payment.Status.PAID, Payment.Status.MANUAL],
+        ).exists()
+        manual_pending = Payment.objects.filter(
+            monthly_fee=fee,
+            status=Payment.Status.PENDING,
+            token="",
+        ).exists()
+        if already_paid or manual_pending:
+            return Response({"detail": "Ya existe un pago registrado o pendiente para esta cuota."}, status=400)
+
+        payment = Payment.objects.create(
+            resident=request.user,
+            monthly_fee=fee,
+            amount=fee.amount,
+            status=Payment.Status.PENDING,
+        )
+        return Response(PaymentSerializer(payment).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        tags=["Pagos"],
         summary="Marcar pago como pagado",
         description="El **administrador** marca manualmente un pago existente como pagado (`MANUAL`), opcionalmente con notas adicionales.",
     )

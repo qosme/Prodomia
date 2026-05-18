@@ -29,6 +29,7 @@ export default function ResidentPaymentsPage() {
   const [payments, setPayments] = useState([])
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
+  const [requestingManual, setRequestingManual] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -49,6 +50,38 @@ export default function ResidentPaymentsPage() {
       p.monthly_fee?.id === fee.id &&
       (p.status === 'PAID' || p.status === 'MANUAL'),
   )
+
+  const currentFeePending = fee && payments.some(
+    (p) => p.monthly_fee?.id === fee.id && p.status === 'PENDING' && !p.token,
+  )
+
+  const resolvedFeeIds = new Set(
+    payments
+      .filter((p) => p.status === 'PAID' || p.status === 'MANUAL')
+      .map((p) => p.monthly_fee?.id)
+      .filter(Boolean)
+  )
+  const visiblePayments = payments.filter(
+    (p) => p.status !== 'PENDING' || !resolvedFeeIds.has(p.monthly_fee?.id),
+  )
+
+  const handleManualPay = async () => {
+    if (!fee) return
+    setRequestingManual(true)
+    setError('')
+    try {
+      await apiFetch('/payments/payments/request_manual/', {
+        method: 'POST',
+        body: JSON.stringify({ monthly_fee_id: fee.id }),
+      })
+      const paymentsData = await apiFetch('/payments/payments/my_payments/')
+      setPayments(paymentsData)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setRequestingManual(false)
+    }
+  }
 
   const handlePay = async () => {
     if (!fee) return
@@ -121,15 +154,27 @@ export default function ResidentPaymentsPage() {
                   </p>
                   {currentFeePaid ? (
                     <span className="pill ok">Pagado</span>
+                  ) : currentFeePending ? (
+                    <span className="pill">Pendiente de aprobación</span>
                   ) : (
-                    <button
-                      className="btn primary"
-                      onClick={handlePay}
-                      disabled={paying}
-                      style={{ fontSize: 15, padding: '12px 20px' }}
-                    >
-                      {paying ? 'Redirigiendo a WebPay…' : 'Pagar con WebPay Plus'}
-                    </button>
+                    <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                      <button
+                        className="btn primary"
+                        onClick={handlePay}
+                        disabled={paying || requestingManual}
+                        style={{ fontSize: 15, padding: '12px 20px' }}
+                      >
+                        {paying ? 'Redirigiendo a WebPay…' : 'Pagar con WebPay Plus'}
+                      </button>
+                      <button
+                        className="btn"
+                        onClick={handleManualPay}
+                        disabled={paying || requestingManual}
+                        style={{ fontSize: 15, padding: '12px 20px' }}
+                      >
+                        {requestingManual ? 'Registrando…' : 'Pagar manualmente'}
+                      </button>
+                    </div>
                   )}
                 </>
               ) : (
@@ -141,11 +186,11 @@ export default function ResidentPaymentsPage() {
           <div>
             <div className="card">
               <h3 style={{ marginTop: 0 }}>Historial de Pagos</h3>
-              {payments.length === 0 ? (
+              {visiblePayments.length === 0 ? (
                 <p className="muted">No hay registros de pagos.</p>
               ) : (
                 <div className="list">
-                  {payments.map((p) => (
+                  {visiblePayments.map((p) => (
                     <div key={p.id} className="item">
                       <div className="row" style={{ justifyContent: 'space-between' }}>
                         <strong>
