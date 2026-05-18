@@ -1,6 +1,6 @@
 # Prodomia
 
-Sistema de gestión para condominios. Permite a residentes registrarse, enviar reclamos con fotos y hacer seguimiento de su estado. Los administradores aprueban residentes, asignan reclamos al personal de mantenimiento y gestionan cuotas, pagos y anuncios. El personal ve sus reclamos asignados y actualiza su estado.
+Sistema de gestión para condominios. Permite a residentes registrarse, enviar reclamos con fotos y hacer seguimiento de su estado. Los administradores aprueban residentes, asignan reclamos al personal de mantenimiento y gestionan cuotas, pagos y anuncios. El personal ve sus reclamos asignados y actualiza su estado. Los conserjes registran y gestionan los pedidos recibidos en portería.
 
 ## Ejecución local
 
