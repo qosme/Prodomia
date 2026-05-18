@@ -45,7 +45,7 @@ function AppNav() {
     <div className="nav">
       <div className="container nav-inner">
         <NavLink className="brand" to="/">
-          Prodomia
+          Prodomia - Los Sauces III
         </NavLink>
         <div className="tabs">
           {user ? (
