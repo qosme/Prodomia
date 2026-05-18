@@ -357,9 +357,9 @@ export default function ComplaintDetailPage() {
                     .map((h) => (
                       <div key={h.id} className="item" style={{ cursor: 'default' }}>
                         <div className="row" style={{ gap: 6 }}>
-                          <span className="pill">{STATUS_LABELS[h.from_status] ?? h.from_status}</span>
+                          <StatusPill status={h.from_status} />
                           <ArrowRight size={14} className="muted" />
-                          <span className="pill ok">{STATUS_LABELS[h.to_status] ?? h.to_status}</span>
+                          <StatusPill status={h.to_status} />
                         </div>
                         <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
                           {new Date(h.created_at).toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}

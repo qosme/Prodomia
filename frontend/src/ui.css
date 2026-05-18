@@ -198,8 +198,8 @@ textarea {
 }
 
 .pill.warn {
-  border-color: rgba(234, 179, 8, 0.55);
-  color: rgba(234, 179, 8, 0.95);
+  border-color: rgba(205, 127, 50, 0.55);
+  color: rgba(205, 127, 50, 0.95);
 }
 
 .pill.info {
