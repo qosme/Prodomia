@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -180,7 +181,11 @@ class WebpayInitView(APIView):
         buy_order = f"BO-{uuid.uuid4().hex[:16]}"
         session_id = f"SID-{request.user.id}-{fee.id}"
 
-        return_url = settings.TRANSBANK_RETURN_URL
+        configured_url = getattr(settings, "TRANSBANK_RETURN_URL", "")
+        if configured_url and "localhost" not in configured_url:
+            return_url = configured_url
+        else:
+            return_url = request.build_absolute_uri(reverse("webpay-callback"))
         try:
             result = init_transaction(buy_order, session_id, int(fee.amount), return_url)
         except Exception as exc:
