@@ -1,3 +1,5 @@
+import threading
+
 from django.conf import settings
 from django.core.mail import send_mail
 
@@ -21,13 +23,16 @@ def notify_package_received(package) -> None:
         f"Equipo Prodomia"
     )
 
-    try:
-        send_mail(
-            subject="Tiene un paquete esperándolo - Prodomia",
-            message=body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[resident.email],
-            fail_silently=False,
-        )
-    except Exception:
-        pass
+    def send():
+        try:
+            send_mail(
+                subject="Tiene un paquete esperándolo - Prodomia",
+                message=body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[resident.email],
+                fail_silently=False,
+            )
+        except BaseException:
+            pass
+
+    threading.Thread(target=send, daemon=True).start()
