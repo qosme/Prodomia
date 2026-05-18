@@ -108,6 +108,15 @@ a {
   background: rgba(239, 68, 68, 0.16);
   border-color: rgba(239, 68, 68, 0.5);
 }
+.btn.success {
+  background: rgba(34, 197, 94, 0.16);
+  border-color: rgba(34, 197, 94, 0.5);
+  color: #000;
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 .grid {
   display: grid;

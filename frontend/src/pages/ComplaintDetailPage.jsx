@@ -33,6 +33,9 @@ export default function ComplaintDetailPage() {
   const canManage = useMemo(() => user?.role === 'manager', [user])
   const canStaffUpdate = useMemo(() => user?.role === 'staff', [user])
   const fileInputRef = useRef(null)
+  const [deleteMode, setDeleteMode] = useState(false)
+  const [selectedPhotos, setSelectedPhotos] = useState(new Set())
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   async function load() {
     setError('')
@@ -68,6 +71,34 @@ export default function ComplaintDetailPage() {
       await load()
     } catch (err) {
       setError(err.message || 'Failed to add comment')
+    }
+  }
+
+  function toggleSelectPhoto(photoId) {
+    setSelectedPhotos(prev => {
+      const next = new Set(prev)
+      if (next.has(photoId)) next.delete(photoId)
+      else next.add(photoId)
+      return next
+    })
+  }
+
+  function cancelDeleteMode() {
+    setDeleteMode(false)
+    setSelectedPhotos(new Set())
+    setConfirmDelete(false)
+  }
+
+  async function deleteSelectedPhotos() {
+    try {
+      let d
+      for (const photoId of selectedPhotos) {
+        d = await apiFetch(`/complaints/${id}/photos/${photoId}/`, { method: 'DELETE' })
+      }
+      if (d) setData(d)
+      cancelDeleteMode()
+    } catch (err) {
+      setError(err.message || 'Failed to delete photos')
     }
   }
 
@@ -145,7 +176,7 @@ export default function ComplaintDetailPage() {
 
             <div style={{ height: 14 }} />
             <h2>Fotos</h2>
-            <div className="row">
+            <div className="row" style={{ gap: 8 }}>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -157,21 +188,94 @@ export default function ComplaintDetailPage() {
                   e.target.value = ''
                 }}
               />
-              <button className="btn" type="button" onClick={() => fileInputRef.current?.click()}>
-                Elegir archivo
-              </button>
+              {!deleteMode && (!canManage || data.resident === user?.id) && (
+                <>
+                  <button className="btn primary" type="button" onClick={() => fileInputRef.current?.click()}>
+                    Elegir archivo
+                  </button>
+                  {data.photos?.some(p => p.uploaded_by === user?.id) && (
+                    <button className="btn danger" type="button" onClick={() => setDeleteMode(true)}>
+                      Borrar archivo
+                    </button>
+                  )}
+                </>
+              )}
+              {deleteMode && (
+                <>
+                  {!confirmDelete ? (
+                    <>
+                      <button
+                        className="btn danger"
+                        type="button"
+                        disabled={selectedPhotos.size === 0}
+                        onClick={() => setConfirmDelete(true)}
+                      >
+                        Eliminar {selectedPhotos.size > 0 ? `(${selectedPhotos.size})` : ''}
+                      </button>
+                      <button className="btn" type="button" onClick={cancelDeleteMode}>
+                        Cancelar
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="muted" style={{ alignSelf: 'center', fontSize: 13 }}>
+                        ¿Eliminar {selectedPhotos.size} foto{selectedPhotos.size !== 1 ? 's' : ''}?
+                      </span>
+                      <button className="btn danger" type="button" onClick={deleteSelectedPhotos}>
+                        Confirmar
+                      </button>
+                      <button className="btn" type="button" onClick={() => setConfirmDelete(false)}>
+                        Cancelar
+                      </button>
+                    </>
+                  )}
+                </>
+              )}
             </div>
+            {deleteMode && !confirmDelete && (
+              <div className="muted" style={{ fontSize: 13, marginTop: 6 }}>
+                Haz clic en las fotos que quieres eliminar y luego presiona <strong>Eliminar</strong>.
+              </div>
+            )}
             <div style={{ height: 8 }} />
-            <div className="row" style={{ gap: 8 }}>
-              {data.photos?.map((p) => (
-                <a key={p.id} href={p.image_url} target="_blank" rel="noreferrer">
-                  <img
-                    src={p.image_url}
-                    alt=""
-                    style={{ width: 110, height: 90, objectFit: 'cover', borderRadius: 12, border: '1px solid var(--border)' }}
-                  />
-                </a>
-              ))}
+            <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+              {data.photos?.map((p) => {
+                const canDelete = p.uploaded_by === user?.id
+                const isSelected = selectedPhotos.has(p.id)
+                return (
+                  <div
+                    key={p.id}
+                    style={{ position: 'relative', display: 'inline-block', cursor: deleteMode && canDelete ? 'pointer' : 'default' }}
+                    onClick={() => deleteMode && canDelete && toggleSelectPhoto(p.id)}
+                  >
+                    <img
+                      src={p.image_url}
+                      alt=""
+                      style={{
+                        width: 110, height: 90, objectFit: 'cover', borderRadius: 12, display: 'block',
+                        border: isSelected ? '2px solid #e53e3e' : '1px solid var(--border)',
+                        opacity: deleteMode && !canDelete ? 0.4 : 1,
+                      }}
+                    />
+                    {deleteMode && canDelete && (
+                      <div style={{
+                        position: 'absolute', inset: 0, borderRadius: 12,
+                        background: isSelected ? 'rgba(229,62,62,0.25)' : 'transparent',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {isSelected && (
+                          <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#e53e3e', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 13, fontWeight: 700 }}>
+                            ✓
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {!deleteMode && (
+                      <a href={p.image_url} target="_blank" rel="noreferrer" style={{ position: 'absolute', inset: 0 }} />
+                    )}
+                  </div>
+                )
+              })}
               {(!data.photos || data.photos.length === 0) && <div className="muted">Sin fotos.</div>}
             </div>
 

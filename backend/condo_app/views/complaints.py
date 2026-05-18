@@ -133,6 +133,24 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         tags=["Reclamos"],
+        summary="Eliminar foto",
+        description="Elimina una foto de un reclamo. Solo el residente que la subió o el administrador pueden eliminarla.",
+    )
+    @action(detail=True, methods=["delete"], url_path=r"photos/(?P<photo_id>[^/.]+)")
+    def delete_photo(self, request, pk=None, photo_id=None):
+        complaint = self.get_object()
+        try:
+            photo = complaint.photos.get(pk=photo_id)
+        except ComplaintPhoto.DoesNotExist:
+            return Response({"detail": "Foto no encontrada."}, status=404)
+        if photo.uploaded_by_id != request.user.id:
+            return Response({"detail": "No tienes permiso para eliminar esta foto."}, status=403)
+        photo.delete()
+        complaint.refresh_from_db()
+        return Response(ComplaintSerializer(complaint, context={"request": request}).data)
+
+    @extend_schema(
+        tags=["Reclamos"],
         summary="Generar firma para subida a Cloudinary",
         description="Retorna timestamp, firma y api_key para subir imágenes directamente a Cloudinary de forma segura.",
     )
