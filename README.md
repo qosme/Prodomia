@@ -1,6 +1,6 @@
 # Prodomia
 
-Los residentes pueden registrarse, ser aprobados por un administrador, enviar reclamos con fotos, comentar y hacer seguimiento del estado. Los administradores pueden aprobar residentes, asignar reclamos al personal de mantenimiento y actualizar estados. El personal de mantenimiento puede ver los reclamos asignados y actualizar su estado.
+Sistema de gestión para condominios. Permite a residentes registrarse, enviar reclamos con fotos y hacer seguimiento de su estado. Los administradores aprueban residentes, asignan reclamos al personal de mantenimiento y gestionan cuotas, pagos y anuncios. El personal ve sus reclamos asignados y actualiza su estado.
 
 ## Ejecución local
 
@@ -56,7 +56,9 @@ Frontend: `http://localhost:5173`
 - Registrarse como residente en la UI (`/register`)
 - Iniciar sesión en el admin de Django en `http://localhost:8000/admin/` como superusuario
   - Aprobar residentes desde la página de **Aprobaciones** en la UI de React luego de iniciar sesión como administrador (staff/superusuario)
-  - También puedes crear usuarios staff y luego llamar al endpoint de administrador `POST /api/users/:id/make_staff/`
+  - Crear usuarios staff con el endpoint `POST /api/users/create_staff/`
+  - Crear usuarios conserje con el endpoint `POST /api/users/create_concierge/`
 - Como residente aprobado: enviar un reclamo
 - Como administrador: asignar el reclamo a un usuario del staff
 - Como staff: abrir el reclamo y actualizar el estado
+- Como conserje: registrar y gestionar pedidos recibidos en portería
