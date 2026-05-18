@@ -59,7 +59,17 @@ export default function ResidentPaymentsPage() {
         method: 'POST',
         body: JSON.stringify({ monthly_fee_id: fee.id }),
       })
-      window.location.href = data.redirect_url
+      // WebPay Plus requiere un POST con token_ws, ya que solo un GET da una página en blanco
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = data.redirect_url
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = 'token_ws'
+      input.value = data.token
+      form.appendChild(input)
+      document.body.appendChild(form)
+      form.submit()
     } catch (e) {
       setError(e.message)
       setPaying(false)
