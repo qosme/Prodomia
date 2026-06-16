@@ -15,6 +15,9 @@ export default function AdminFeesPage() {
   const [unitsLoading, setUnitsLoading] = useState(true)
   const [msg, setMsg] = useState('')
   const [error, setError] = useState('')
+  const [editingId, setEditingId] = useState(null)
+  const [editForm, setEditForm] = useState({ amount: '', due_date: '' })
+  const [saving, setSaving] = useState(false)
   const now = new Date()
   const [form, setForm] = useState({
     unit: '',
@@ -96,6 +99,36 @@ export default function AdminFeesPage() {
       loadFees()
     } catch (e) {
       setError(e.message)
+    }
+  }
+
+  const startEdit = (fee) => {
+    setEditingId(fee.id)
+    setEditForm({ amount: fee.amount, due_date: fee.due_date })
+    setMsg('')
+    setError('')
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditForm({ amount: '', due_date: '' })
+  }
+
+  const saveFee = async (id) => {
+    setSaving(true)
+    setError('')
+    try {
+      await apiFetch(`/payments/monthly-fees/${id}/`, {
+        method: 'PATCH',
+        body: JSON.stringify({ amount: parseFloat(editForm.amount), due_date: editForm.due_date }),
+      })
+      setMsg('Cuota actualizada.')
+      setEditingId(null)
+      loadFees()
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -190,13 +223,14 @@ export default function AdminFeesPage() {
                 <th>Período</th>
                 <th>Monto</th>
                 <th>Vencimiento</th>
+                <th>Creada el</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {fees.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="muted" style={{ textAlign: 'center', padding: 20 }}>
+                  <td colSpan={6} className="muted" style={{ textAlign: 'center', padding: 20 }}>
                     Sin cuotas creadas aún.
                   </td>
                 </tr>
@@ -205,16 +239,73 @@ export default function AdminFeesPage() {
                 <tr key={f.id}>
                   <td>{f.unit}</td>
                   <td>{MONTHS[f.period_month - 1]} {f.period_year}</td>
-                  <td>${Number(f.amount).toLocaleString('es-CL')}</td>
-                  <td>{f.due_date}</td>
                   <td>
-                    <button
-                      className="btn danger"
-                      style={{ fontSize: 13, padding: '6px 10px' }}
-                      onClick={() => deleteFee(f.id)}
-                    >
-                      Eliminar
-                    </button>
+                    {editingId === f.id ? (
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={editForm.amount}
+                        onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
+                        style={{ width: 110 }}
+                      />
+                    ) : (
+                      `$${Number(f.amount).toLocaleString('es-CL')}`
+                    )}
+                  </td>
+                  <td>
+                    {editingId === f.id ? (
+                      <input
+                        type="date"
+                        value={editForm.due_date}
+                        onChange={(e) => setEditForm({ ...editForm, due_date: e.target.value })}
+                      />
+                    ) : (
+                      f.due_date
+                    )}
+                  </td>
+                  <td className="muted" style={{ fontSize: 13 }}>
+                    {new Date(f.created_at).toLocaleDateString('es-CL')}
+                  </td>
+                  <td style={{ display: 'flex', gap: 6 }}>
+                    {f.has_paid_payments ? (
+                      <span className="muted" style={{ fontSize: 13 }}>Pagada</span>
+                    ) : editingId === f.id ? (
+                      <>
+                        <button
+                          className="btn primary"
+                          style={{ fontSize: 13, padding: '6px 10px' }}
+                          onClick={() => saveFee(f.id)}
+                          disabled={saving}
+                        >
+                          {saving ? 'Guardando…' : 'Guardar'}
+                        </button>
+                        <button
+                          className="btn"
+                          style={{ fontSize: 13, padding: '6px 10px' }}
+                          onClick={cancelEdit}
+                        >
+                          Cancelar
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className="btn"
+                          style={{ fontSize: 13, padding: '6px 10px' }}
+                          onClick={() => startEdit(f)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="btn danger"
+                          style={{ fontSize: 13, padding: '6px 10px' }}
+                          onClick={() => deleteFee(f.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
