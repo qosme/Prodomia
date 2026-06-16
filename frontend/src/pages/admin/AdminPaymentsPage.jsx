@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../../api.js'
+import { downloadPaymentReceipt } from '../../utils/paymentReceipt.js'
 
 const STATUS_COLORS = {
   PAID: 'ok',
@@ -229,6 +230,15 @@ export default function AdminPaymentsPage() {
                           onClick={() => setMarkingId(markingId === p.id ? null : p.id)}
                         >
                           Marcar como Pagado
+                        </button>
+                      )}
+                      {(p.status === 'PAID' || p.status === 'MANUAL') && (
+                        <button
+                          className="btn success"
+                          style={{ fontSize: 13, padding: '6px 10px' }}
+                          onClick={() => downloadPaymentReceipt(p)}
+                        >
+                          Descargar PDF
                         </button>
                       )}
                     </td>
