@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { apiFetch } from '../api.js'
+import { downloadPaymentReceipt } from '../utils/paymentReceipt.js'
 
 const MONTHS = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -210,6 +211,15 @@ export default function ResidentPaymentsPage() {
                         <div className="muted" style={{ fontSize: 12 }}>
                           Auth: {p.authorization_code}
                         </div>
+                      )}
+                      {(p.status === 'PAID' || p.status === 'MANUAL') && (
+                        <button
+                          className="btn success"
+                          style={{ fontSize: 12, padding: '4px 10px', marginTop: 8 }}
+                          onClick={() => downloadPaymentReceipt(p)}
+                        >
+                          Descargar comprobante (PDF)
+                        </button>
                       )}
                     </div>
                   ))}
