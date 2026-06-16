@@ -161,7 +161,18 @@ function NewComplaintForm({ onCreated }) {
       </div>
       <div className="field">
         <label>Categoría (opcional)</label>
-        <input value={form.category} onChange={(e) => update('category', e.target.value)} />
+        <select value={form.category} onChange={(e) => update('category', e.target.value)}>
+          <option value="">- Sin categoría -</option>
+          <option>Ruidos molestos</option>
+          <option>Áreas comunes</option>
+          <option>Estacionamiento</option>
+          <option>Mantención</option>
+          <option>Limpieza</option>
+          <option>Seguridad</option>
+          <option>Mascotas</option>
+          <option>Daños</option>
+          <option>Otro</option>
+        </select>
       </div>
       <div className="field">
         <label>Fotos (opcional)</label>

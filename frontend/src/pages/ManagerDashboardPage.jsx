@@ -5,6 +5,18 @@ import { useAuth } from '../useAuth.js'
 
 const STATUSES = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'CLOSED']
 
+const CATEGORIES = [
+  'Ruidos molestos',
+  'Áreas comunes',
+  'Estacionamiento',
+  'Mantención',
+  'Limpieza',
+  'Seguridad',
+  'Mascotas',
+  'Daños',
+  'Otro',
+]
+
 const STATUS_LABELS = {
   NEW: 'Nuevo',
   ASSIGNED: 'Asignado',
@@ -27,12 +39,6 @@ export default function ManagerDashboardPage() {
   const [category, setCategory] = useState('')
   const [error, setError] = useState('')
   const staffUsers = useMemo(() => users.filter((u) => u.staff_profile), [users])
-  const categories = useMemo(() => {
-    const set = new Set()
-    complaints.forEach((c) => c.category && set.add(c.category))
-    return Array.from(set).sort()
-  }, [complaints])
-
   const filtered = useMemo(() => {
     if (!category) return complaints
     return complaints.filter((c) => c.category === category)
@@ -110,7 +116,7 @@ export default function ManagerDashboardPage() {
           <div className="row" style={{ gap: 8 }}>
             <select value={category} onChange={(e) => setCategory(e.target.value)}>
               <option value="">Todas las categorías</option>
-              {categories.map((c) => (
+              {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
