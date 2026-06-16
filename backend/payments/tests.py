@@ -200,3 +200,36 @@ class DashboardStatsViewTest(APITestCase):
         self.client.force_authenticate(user=self.manager)
         response = self.client.get(self.URL)
         self.assertIsInstance(response.data["revenue_this_month"], float)
+
+
+# ─── MonthlyFee PATCH Tests ───────────────────────────────────────────────────
+
+class MonthlyFeePatchTest(APITestCase):
+    def setUp(self):
+        self.manager = _make_manager("patch_mgr")
+        self.resident = _make_resident("patch_res", unit="101", approved=True)
+        self.fee = _make_fee(unit="101", year=2026, month=6, amount="50000.00")
+        self.URL = f"/api/payments/monthly-fees/{self.fee.id}/"
+
+    def test_patch_amount_as_manager_updates_fee(self):
+        self.client.force_authenticate(user=self.manager)
+        response = self.client.patch(self.URL, {"amount": "75000.00"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.fee.refresh_from_db()
+        self.assertEqual(float(self.fee.amount), 75000.00)
+
+    def test_patch_due_date_as_manager_updates_fee(self):
+        self.client.force_authenticate(user=self.manager)
+        response = self.client.patch(self.URL, {"due_date": "2026-06-20"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.fee.refresh_from_db()
+        self.assertEqual(str(self.fee.due_date), "2026-06-20")
+
+    def test_patch_unauthenticated_returns_401(self):
+        response = self.client.patch(self.URL, {"amount": "75000.00"})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_patch_as_resident_returns_403(self):
+        self.client.force_authenticate(user=self.resident)
+        response = self.client.patch(self.URL, {"amount": "75000.00"})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

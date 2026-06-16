@@ -4,6 +4,18 @@ import { apiFetch } from '../../api.js'
 
 const STATUSES = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'CLOSED']
 
+const CATEGORIES = [
+  'Ruidos molestos',
+  'Áreas comunes',
+  'Estacionamiento',
+  'Mantención',
+  'Limpieza',
+  'Seguridad',
+  'Mascotas',
+  'Daños',
+  'Otro',
+]
+
 const STATUS_LABELS = {
   NEW: 'Nuevo',
   ASSIGNED: 'Asignado',
@@ -30,12 +42,6 @@ export default function AdminComplaintsPage() {
   const [error, setError] = useState('')
   const [filterCat, setFilterCat] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
-
-  const categories = useMemo(() => {
-    const set = new Set()
-    complaints.forEach((c) => c.category && set.add(c.category))
-    return Array.from(set).sort()
-  }, [complaints])
 
   const filtered = useMemo(
     () =>
@@ -92,7 +98,7 @@ export default function AdminComplaintsPage() {
           <label className="muted" style={{ fontSize: 13 }}>Categoría</label>
           <select style={{ marginLeft: 8, width: 'auto' }} value={filterCat} onChange={(e) => setFilterCat(e.target.value)}>
             <option value="">Todas</option>
-            {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div>
